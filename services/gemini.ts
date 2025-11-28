@@ -1,6 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 
-const apiKey = process.env.API_KEY || '';
+// Safe access to process.env for browser environments where it might be undefined
+const apiKey = (typeof process !== 'undefined' && process.env && process.env.API_KEY) ? process.env.API_KEY : '';
 const ai = new GoogleGenAI({ apiKey });
 
 export const generateMotivation = async (studentName: string): Promise<string> => {

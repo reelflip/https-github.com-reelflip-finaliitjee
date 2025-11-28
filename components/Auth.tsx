@@ -12,7 +12,8 @@ import {
   ChevronRight,
   ShieldCheck,
   Loader2,
-  Database
+  Database,
+  WifiOff
 } from 'lucide-react';
 
 interface AuthProps {
@@ -44,6 +45,67 @@ const TARGET_YEARS = [
   "JEE 2027",
   "JEE 2028"
 ];
+
+// SQL Schema as a string for client-side download
+const SQL_SCHEMA = `
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(100),
+    email VARCHAR(100) UNIQUE,
+    password_hash VARCHAR(255),
+    role ENUM('student','parent','admin'),
+    recovery_question VARCHAR(255),
+    recovery_answer VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE students (
+    user_id INT PRIMARY KEY,
+    institute VARCHAR(100),
+    target_year VARCHAR(20),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE parents (
+    user_id INT PRIMARY KEY,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE syllabus_topics (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    subject VARCHAR(50),
+    phase VARCHAR(20),
+    topic_name VARCHAR(100),
+    est_hours INT
+);
+
+CREATE TABLE student_topic_progress (
+    student_id INT,
+    topic_id INT,
+    status ENUM('not_started','in_progress','completed'),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (student_id, topic_id)
+);
+
+CREATE TABLE tests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100),
+    type ENUM('mock','pyq'),
+    duration INT,
+    total_marks INT,
+    published BOOLEAN DEFAULT 0
+);
+
+CREATE TABLE student_test_attempts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT,
+    test_id INT,
+    score INT,
+    accuracy FLOAT,
+    time_spent INT,
+    attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+`.trim();
 
 const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   const [isRegister, setIsRegister] = useState(true);
@@ -96,6 +158,19 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
     } finally {
         setIsLoading(false);
     }
+  };
+
+  const handleDownloadSql = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const blob = new Blob([SQL_SCHEMA], { type: 'application/sql' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'iit_jee_tracker_schema.sql';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -312,6 +387,10 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
 
           {!isRegister && (
               <div className="mt-8 pt-6 border-t border-slate-50 text-center">
+                <div className="flex items-center justify-center gap-2 text-xs text-slate-400 mb-2">
+                    <WifiOff size={12} />
+                    <span>Demo Mode (PHP Backend Disconnected)</span>
+                </div>
                 <p className="text-xs text-slate-400">
                     Protected by reCAPTCHA and subject to the Privacy Policy and Terms of Service.
                 </p>
@@ -324,14 +403,13 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
         <p className="text-xs font-medium text-slate-400 opacity-60">
             &copy; 2024 IIT JEE Tracker. Exhaustive System.
         </p>
-        <a 
-          href="/database.sql" 
-          download="iit_jee_tracker_schema.sql"
+        <button 
+          onClick={handleDownloadSql}
           className="inline-flex items-center gap-1.5 text-[10px] text-blue-500 hover:text-blue-700 transition-colors bg-blue-50 px-3 py-1.5 rounded-full"
         >
           <Database size={10} />
           Download Database Schema (SQL)
-        </a>
+        </button>
       </div>
     </div>
   );
