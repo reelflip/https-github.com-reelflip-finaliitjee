@@ -166,7 +166,101 @@ CREATE TABLE notifications (
     publish_date DATE
 );
 
--- Note: Run the INSERT statements provided in the Admin Panel to populate syllabus data.
+-- ==========================================
+-- 5. INITIAL DATA SEEDING (SYLLABUS)
+-- ==========================================
+
+-- Physics (Unit Wise)
+INSERT INTO syllabus_topics (id, subject, chapter_name, phase, topic_name, est_hours) VALUES
+(1011, 'Physics', 'General Physics', 'Class 11', 'Units and Dimensions', 4),
+(1012, 'Physics', 'General Physics', 'Class 11', 'Errors & Measurements', 3),
+(1013, 'Physics', 'General Physics', 'Class 11', 'Vectors', 5),
+(1021, 'Physics', 'Mechanics', 'Class 11', 'Kinematics (1D & 2D)', 12),
+(1022, 'Physics', 'Mechanics', 'Class 11', 'Newton''s Laws of Motion', 10),
+(1023, 'Physics', 'Mechanics', 'Class 11', 'Friction', 5),
+(1024, 'Physics', 'Mechanics', 'Class 11', 'Work, Energy, and Power', 8),
+(1025, 'Physics', 'Mechanics', 'Class 11', 'Circular Motion', 6),
+(1026, 'Physics', 'Mechanics', 'Class 11', 'Center of Mass & Collisions', 10),
+(1027, 'Physics', 'Mechanics', 'Class 11', 'Rotational Motion', 18),
+(1028, 'Physics', 'Mechanics', 'Class 11', 'Gravitation', 7),
+(1029, 'Physics', 'Mechanics', 'Class 11', 'Fluid Mechanics', 10),
+(1031, 'Physics', 'Thermal Physics', 'Class 11', 'Thermal Expansion & Calorimetry', 5),
+(1032, 'Physics', 'Thermal Physics', 'Class 11', 'Thermodynamics', 9),
+(1033, 'Physics', 'Thermal Physics', 'Class 11', 'Kinetic Theory of Gases', 5),
+(1034, 'Physics', 'Thermal Physics', 'Class 11', 'Heat Transfer', 6),
+(1041, 'Physics', 'Oscillations & Waves', 'Class 11', 'Simple Harmonic Motion', 10),
+(1042, 'Physics', 'Oscillations & Waves', 'Class 11', 'Waves & Sound', 12),
+(1051, 'Physics', 'Electricity & Magnetism', 'Class 12', 'Electrostatics', 16),
+(1052, 'Physics', 'Electricity & Magnetism', 'Class 12', 'Capacitance', 6),
+(1053, 'Physics', 'Electricity & Magnetism', 'Class 12', 'Current Electricity', 14),
+(1054, 'Physics', 'Electricity & Magnetism', 'Class 12', 'Moving Charges & Magnetism', 12),
+(1055, 'Physics', 'Electricity & Magnetism', 'Class 12', 'Magnetism & Matter', 5),
+(1056, 'Physics', 'Electricity & Magnetism', 'Class 12', 'EMI', 9),
+(1057, 'Physics', 'Electricity & Magnetism', 'Class 12', 'Alternating Current', 7),
+(1061, 'Physics', 'Optics', 'Class 12', 'Ray Optics', 14),
+(1062, 'Physics', 'Optics', 'Class 12', 'Wave Optics', 9),
+(1063, 'Physics', 'Modern Physics', 'Class 12', 'Dual Nature of Matter', 5),
+(1064, 'Physics', 'Modern Physics', 'Class 12', 'Atoms & Nuclei', 7),
+(1065, 'Physics', 'Modern Physics', 'Class 12', 'Semiconductors', 8);
+
+-- Chemistry (Unit Wise)
+INSERT INTO syllabus_topics (id, subject, chapter_name, phase, topic_name, est_hours) VALUES
+(2011, 'Chemistry', 'Physical Chemistry', 'Class 11', 'Mole Concept', 8),
+(2012, 'Chemistry', 'Physical Chemistry', 'Class 11', 'Atomic Structure', 10),
+(2013, 'Chemistry', 'Physical Chemistry', 'Class 11', 'Gaseous State', 6),
+(2014, 'Chemistry', 'Physical Chemistry', 'Class 11', 'Chemical Equilibrium', 8),
+(2015, 'Chemistry', 'Physical Chemistry', 'Class 11', 'Ionic Equilibrium', 12),
+(2016, 'Chemistry', 'Physical Chemistry', 'Class 11', 'Thermodynamics', 10),
+(2017, 'Chemistry', 'Physical Chemistry', 'Class 11', 'Redox Reactions', 5),
+(2041, 'Chemistry', 'Physical Chemistry', 'Class 12', 'Solid State', 7),
+(2042, 'Chemistry', 'Physical Chemistry', 'Class 12', 'Solutions', 8),
+(2043, 'Chemistry', 'Physical Chemistry', 'Class 12', 'Electrochemistry', 11),
+(2044, 'Chemistry', 'Physical Chemistry', 'Class 12', 'Chemical Kinetics', 9),
+(2045, 'Chemistry', 'Physical Chemistry', 'Class 12', 'Surface Chemistry', 5),
+(2021, 'Chemistry', 'Inorganic Chemistry', 'Class 11', 'Periodic Table', 6),
+(2022, 'Chemistry', 'Inorganic Chemistry', 'Class 11', 'Chemical Bonding', 14),
+(2023, 'Chemistry', 'Inorganic Chemistry', 'Class 11', 'Hydrogen & s-Block', 6),
+(2024, 'Chemistry', 'Inorganic Chemistry', 'Class 11', 'p-Block Elements (Group 13, 14)', 6),
+(2051, 'Chemistry', 'Inorganic Chemistry', 'Class 12', 'Metallurgy', 5),
+(2052, 'Chemistry', 'Inorganic Chemistry', 'Class 12', 'p-Block (Group 15-18)', 10),
+(2053, 'Chemistry', 'Inorganic Chemistry', 'Class 12', 'd and f Block', 7),
+(2054, 'Chemistry', 'Inorganic Chemistry', 'Class 12', 'Coordination Compounds', 12),
+(2031, 'Chemistry', 'Organic Chemistry', 'Class 11', 'GOC', 15),
+(2032, 'Chemistry', 'Organic Chemistry', 'Class 11', 'Isomerism', 6),
+(2033, 'Chemistry', 'Organic Chemistry', 'Class 11', 'Hydrocarbons', 10),
+(2061, 'Chemistry', 'Organic Chemistry', 'Class 12', 'Haloalkanes & Haloarenes', 8),
+(2062, 'Chemistry', 'Organic Chemistry', 'Class 12', 'Alcohols, Phenols, Ethers', 9),
+(2063, 'Chemistry', 'Organic Chemistry', 'Class 12', 'Aldehydes, Ketones, Carboxylic', 12),
+(2064, 'Chemistry', 'Organic Chemistry', 'Class 12', 'Amines', 6),
+(2065, 'Chemistry', 'Organic Chemistry', 'Class 12', 'Biomolecules & Polymers', 6);
+
+-- Mathematics (Unit Wise)
+INSERT INTO syllabus_topics (id, subject, chapter_name, phase, topic_name, est_hours) VALUES
+(3011, 'Mathematics', 'Algebra', 'Class 11', 'Sets, Relations & Functions', 8),
+(3013, 'Mathematics', 'Algebra', 'Class 11', 'Quadratic Equations', 9),
+(3014, 'Mathematics', 'Algebra', 'Class 11', 'Complex Numbers', 10),
+(3015, 'Mathematics', 'Algebra', 'Class 11', 'Sequence & Series', 8),
+(3016, 'Mathematics', 'Algebra', 'Class 11', 'Permutations & Combinations', 10),
+(3017, 'Mathematics', 'Algebra', 'Class 11', 'Binomial Theorem', 7),
+(3041, 'Mathematics', 'Algebra', 'Class 12', 'Matrices & Determinants', 10),
+(3042, 'Mathematics', 'Algebra', 'Class 12', 'Probability', 9),
+(3012, 'Mathematics', 'Trigonometry', 'Class 11', 'Trigonometric Ratios & Identities', 12),
+(3018, 'Mathematics', 'Trigonometry', 'Class 11', 'Trigonometric Equations', 6),
+(3019, 'Mathematics', 'Trigonometry', 'Class 11', 'Solutions of Triangles', 6),
+(3045, 'Mathematics', 'Trigonometry', 'Class 12', 'Inverse Trigonometric Func', 6),
+(3021, 'Mathematics', 'Coordinate Geometry', 'Class 11', 'Straight Lines', 10),
+(3022, 'Mathematics', 'Coordinate Geometry', 'Class 11', 'Circles', 9),
+(3023, 'Mathematics', 'Coordinate Geometry', 'Class 11', 'Parabola', 7),
+(3024, 'Mathematics', 'Coordinate Geometry', 'Class 11', 'Ellipse & Hyperbola', 8),
+(3031, 'Mathematics', 'Calculus', 'Class 12', 'Limits, Continuity & Diff', 12),
+(3032, 'Mathematics', 'Calculus', 'Class 12', 'Differentiation', 8),
+(3033, 'Mathematics', 'Calculus', 'Class 12', 'AOD', 12),
+(3034, 'Mathematics', 'Calculus', 'Class 12', 'Indefinite Integration', 12),
+(3035, 'Mathematics', 'Calculus', 'Class 12', 'Definite Integration', 10),
+(3036, 'Mathematics', 'Calculus', 'Class 12', 'Area Under Curve', 6),
+(3037, 'Mathematics', 'Calculus', 'Class 12', 'Differential Equations', 8),
+(3043, 'Mathematics', 'Vectors & 3D Geometry', 'Class 12', 'Vector Algebra', 8),
+(3044, 'Mathematics', 'Vectors & 3D Geometry', 'Class 12', '3D Geometry', 10);
 `.trim();
 
 const Auth: React.FC<AuthProps> = ({ onLogin }) => {

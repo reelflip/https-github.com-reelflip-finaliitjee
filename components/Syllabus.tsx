@@ -9,8 +9,8 @@ const INITIAL_SYLLABUS: Subject[] = [
     chapters: [
       {
         id: 101,
-        name: 'General Physics (Class 11)',
-        phase: 'Phase 1',
+        name: 'General Physics',
+        phase: 'Class 11',
         topics: [
           { id: 1011, name: 'Units and Dimensions', status: 'completed', estHours: 4, exercises: { ex1: 10, ex2: 5, ex3: 0, ex4: 0, ex1_total: 30, ex2_total: 20, ex3_total: 10, ex4_total: 10 } },
           { id: 1012, name: 'Errors & Measurements', status: 'completed', estHours: 3, exercises: { ex1: 15, ex2: 10, ex3: 5, ex4: 0, ex1_total: 30, ex2_total: 20, ex3_total: 10, ex4_total: 10 } },
@@ -19,8 +19,8 @@ const INITIAL_SYLLABUS: Subject[] = [
       },
       {
         id: 102,
-        name: 'Mechanics (Class 11)',
-        phase: 'Phase 1',
+        name: 'Mechanics',
+        phase: 'Class 11',
         topics: [
           { id: 1021, name: 'Kinematics (1D & 2D)', status: 'in_progress', estHours: 12, exercises: { ex1: 25, ex2: 10, ex3: 0, ex4: 0, ex1_total: 50, ex2_total: 30, ex3_total: 20, ex4_total: 10 } },
           { id: 1022, name: 'Newton\'s Laws of Motion', status: 'in_progress', estHours: 10, exercises: { ex1: 10, ex2: 0, ex3: 0, ex4: 0, ex1_total: 45, ex2_total: 30, ex3_total: 15, ex4_total: 10 } },
@@ -35,8 +35,8 @@ const INITIAL_SYLLABUS: Subject[] = [
       },
       {
         id: 103,
-        name: 'Thermal Physics (Class 11)',
-        phase: 'Phase 1',
+        name: 'Thermal Physics',
+        phase: 'Class 11',
         topics: [
           { id: 1031, name: 'Thermal Expansion & Calorimetry', status: 'not_started', estHours: 5, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 25, ex2_total: 15, ex3_total: 10, ex4_total: 5 } },
           { id: 1032, name: 'Thermodynamics', status: 'not_started', estHours: 9, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 40, ex2_total: 25, ex3_total: 15, ex4_total: 10 } },
@@ -46,8 +46,8 @@ const INITIAL_SYLLABUS: Subject[] = [
       },
       {
         id: 104,
-        name: 'Oscillations & Waves (Class 11)',
-        phase: 'Phase 1',
+        name: 'Oscillations & Waves',
+        phase: 'Class 11',
         topics: [
           { id: 1041, name: 'Simple Harmonic Motion (SHM)', status: 'not_started', estHours: 10, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 45, ex2_total: 30, ex3_total: 20, ex4_total: 10 } },
           { id: 1042, name: 'Waves & Sound', status: 'not_started', estHours: 12, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 50, ex2_total: 35, ex3_total: 20, ex4_total: 10 } },
@@ -55,8 +55,8 @@ const INITIAL_SYLLABUS: Subject[] = [
       },
       {
         id: 105,
-        name: 'Electrodynamics (Class 12)',
-        phase: 'Phase 2',
+        name: 'Electricity & Magnetism',
+        phase: 'Class 12',
         topics: [
           { id: 1051, name: 'Electrostatics', status: 'not_started', estHours: 16, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 60, ex2_total: 40, ex3_total: 25, ex4_total: 15 } },
           { id: 1052, name: 'Capacitance', status: 'not_started', estHours: 6, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 30, ex2_total: 20, ex3_total: 10, ex4_total: 5 } },
@@ -69,11 +69,18 @@ const INITIAL_SYLLABUS: Subject[] = [
       },
       {
         id: 106,
-        name: 'Optics & Modern Physics (Class 12)',
-        phase: 'Phase 2',
+        name: 'Optics',
+        phase: 'Class 12',
         topics: [
           { id: 1061, name: 'Ray Optics', status: 'not_started', estHours: 14, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 50, ex2_total: 35, ex3_total: 20, ex4_total: 10 } },
           { id: 1062, name: 'Wave Optics', status: 'not_started', estHours: 9, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 40, ex2_total: 25, ex3_total: 15, ex4_total: 10 } },
+        ]
+      },
+      {
+        id: 107,
+        name: 'Modern Physics',
+        phase: 'Class 12',
+        topics: [
           { id: 1063, name: 'Dual Nature of Matter', status: 'not_started', estHours: 5, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 30, ex2_total: 20, ex3_total: 10, ex4_total: 5 } },
           { id: 1064, name: 'Atoms & Nuclei', status: 'not_started', estHours: 7, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 35, ex2_total: 25, ex3_total: 10, ex4_total: 5 } },
           { id: 1065, name: 'Semiconductors', status: 'not_started', estHours: 8, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 35, ex2_total: 25, ex3_total: 15, ex4_total: 5 } },
@@ -87,8 +94,8 @@ const INITIAL_SYLLABUS: Subject[] = [
     chapters: [
       {
         id: 201,
-        name: 'Physical Chemistry (Class 11)',
-        phase: 'Phase 1',
+        name: 'Physical Chemistry',
+        phase: 'Class 11 & 12',
         topics: [
           { id: 2011, name: 'Mole Concept', status: 'completed', estHours: 8, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 40, ex2_total: 25, ex3_total: 15, ex4_total: 5 } },
           { id: 2012, name: 'Atomic Structure', status: 'completed', estHours: 10, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 45, ex2_total: 30, ex3_total: 20, ex4_total: 10 } },
@@ -97,34 +104,6 @@ const INITIAL_SYLLABUS: Subject[] = [
           { id: 2015, name: 'Ionic Equilibrium', status: 'revision_required', estHours: 12, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 50, ex2_total: 35, ex3_total: 20, ex4_total: 10 } },
           { id: 2016, name: 'Thermodynamics', status: 'not_started', estHours: 10, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 45, ex2_total: 30, ex3_total: 20, ex4_total: 10 } },
           { id: 2017, name: 'Redox Reactions', status: 'not_started', estHours: 5, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 30, ex2_total: 20, ex3_total: 10, ex4_total: 5 } },
-        ]
-      },
-      {
-        id: 202,
-        name: 'Inorganic Chemistry (Class 11)',
-        phase: 'Phase 1',
-        topics: [
-          { id: 2021, name: 'Periodic Table', status: 'in_progress', estHours: 6, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 35, ex2_total: 25, ex3_total: 15, ex4_total: 5 } },
-          { id: 2022, name: 'Chemical Bonding', status: 'in_progress', estHours: 14, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 60, ex2_total: 40, ex3_total: 25, ex4_total: 15 } },
-          { id: 2023, name: 'Hydrogen & s-Block', status: 'not_started', estHours: 6, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 30, ex2_total: 20, ex3_total: 10, ex4_total: 5 } },
-          { id: 2024, name: 'p-Block Elements (Group 13, 14)', status: 'not_started', estHours: 6, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 35, ex2_total: 25, ex3_total: 15, ex4_total: 5 } },
-        ]
-      },
-      {
-        id: 203,
-        name: 'Organic Chemistry (Class 11)',
-        phase: 'Phase 1',
-        topics: [
-          { id: 2031, name: 'GOC (General Organic Chem)', status: 'revision_required', estHours: 15, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 60, ex2_total: 40, ex3_total: 25, ex4_total: 15 } },
-          { id: 2032, name: 'Isomerism', status: 'not_started', estHours: 6, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 30, ex2_total: 20, ex3_total: 15, ex4_total: 5 } },
-          { id: 2033, name: 'Hydrocarbons', status: 'not_started', estHours: 10, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 45, ex2_total: 30, ex3_total: 20, ex4_total: 10 } },
-        ]
-      },
-      {
-        id: 204,
-        name: 'Physical Chemistry (Class 12)',
-        phase: 'Phase 2',
-        topics: [
           { id: 2041, name: 'Solid State', status: 'not_started', estHours: 7, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 35, ex2_total: 25, ex3_total: 15, ex4_total: 5 } },
           { id: 2042, name: 'Solutions', status: 'not_started', estHours: 8, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 40, ex2_total: 25, ex3_total: 15, ex4_total: 10 } },
           { id: 2043, name: 'Electrochemistry', status: 'not_started', estHours: 11, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 50, ex2_total: 35, ex3_total: 20, ex4_total: 10 } },
@@ -133,10 +112,14 @@ const INITIAL_SYLLABUS: Subject[] = [
         ]
       },
       {
-        id: 205,
-        name: 'Inorganic Chemistry (Class 12)',
-        phase: 'Phase 2',
+        id: 202,
+        name: 'Inorganic Chemistry',
+        phase: 'Class 11 & 12',
         topics: [
+          { id: 2021, name: 'Periodic Table', status: 'in_progress', estHours: 6, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 35, ex2_total: 25, ex3_total: 15, ex4_total: 5 } },
+          { id: 2022, name: 'Chemical Bonding', status: 'in_progress', estHours: 14, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 60, ex2_total: 40, ex3_total: 25, ex4_total: 15 } },
+          { id: 2023, name: 'Hydrogen & s-Block', status: 'not_started', estHours: 6, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 30, ex2_total: 20, ex3_total: 10, ex4_total: 5 } },
+          { id: 2024, name: 'p-Block Elements (Group 13, 14)', status: 'not_started', estHours: 6, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 35, ex2_total: 25, ex3_total: 15, ex4_total: 5 } },
           { id: 2051, name: 'Metallurgy', status: 'not_started', estHours: 5, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 30, ex2_total: 20, ex3_total: 10, ex4_total: 5 } },
           { id: 2052, name: 'p-Block (Group 15-18)', status: 'not_started', estHours: 10, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 45, ex2_total: 30, ex3_total: 20, ex4_total: 10 } },
           { id: 2053, name: 'd and f Block Elements', status: 'not_started', estHours: 7, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 35, ex2_total: 25, ex3_total: 15, ex4_total: 5 } },
@@ -144,10 +127,13 @@ const INITIAL_SYLLABUS: Subject[] = [
         ]
       },
       {
-        id: 206,
-        name: 'Organic Chemistry (Class 12)',
-        phase: 'Phase 2',
+        id: 203,
+        name: 'Organic Chemistry',
+        phase: 'Class 11 & 12',
         topics: [
+          { id: 2031, name: 'GOC (General Organic Chem)', status: 'revision_required', estHours: 15, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 60, ex2_total: 40, ex3_total: 25, ex4_total: 15 } },
+          { id: 2032, name: 'Isomerism', status: 'not_started', estHours: 6, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 30, ex2_total: 20, ex3_total: 15, ex4_total: 5 } },
+          { id: 2033, name: 'Hydrocarbons', status: 'not_started', estHours: 10, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 45, ex2_total: 30, ex3_total: 20, ex4_total: 10 } },
           { id: 2061, name: 'Haloalkanes & Haloarenes', status: 'not_started', estHours: 8, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 40, ex2_total: 25, ex3_total: 15, ex4_total: 5 } },
           { id: 2062, name: 'Alcohols, Phenols, Ethers', status: 'not_started', estHours: 9, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 45, ex2_total: 30, ex3_total: 20, ex4_total: 10 } },
           { id: 2063, name: 'Aldehydes, Ketones, Carboxylic Acids', status: 'not_started', estHours: 12, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 55, ex2_total: 40, ex3_total: 25, ex4_total: 15 } },
@@ -163,22 +149,34 @@ const INITIAL_SYLLABUS: Subject[] = [
     chapters: [
       {
         id: 301,
-        name: 'Algebra (Class 11)',
-        phase: 'Phase 1',
+        name: 'Algebra',
+        phase: 'Class 11 & 12',
         topics: [
           { id: 3011, name: 'Sets, Relations & Functions', status: 'in_progress', estHours: 8, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 40, ex2_total: 30, ex3_total: 15, ex4_total: 5 } },
-          { id: 3012, name: 'Trigonometric Ratios', status: 'in_progress', estHours: 12, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 50, ex2_total: 35, ex3_total: 20, ex4_total: 10 } },
           { id: 3013, name: 'Quadratic Equations', status: 'completed', estHours: 9, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 45, ex2_total: 30, ex3_total: 20, ex4_total: 10 } },
           { id: 3014, name: 'Complex Numbers', status: 'completed', estHours: 10, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 45, ex2_total: 30, ex3_total: 20, ex4_total: 10 } },
           { id: 3015, name: 'Sequence & Series', status: 'not_started', estHours: 8, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 40, ex2_total: 30, ex3_total: 15, ex4_total: 10 } },
           { id: 3016, name: 'Permutations & Combinations', status: 'revision_required', estHours: 10, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 50, ex2_total: 35, ex3_total: 20, ex4_total: 10 } },
           { id: 3017, name: 'Binomial Theorem', status: 'not_started', estHours: 7, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 35, ex2_total: 25, ex3_total: 15, ex4_total: 5 } },
+          { id: 3041, name: 'Matrices & Determinants', status: 'not_started', estHours: 10, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 50, ex2_total: 35, ex3_total: 20, ex4_total: 10 } },
+          { id: 3042, name: 'Probability', status: 'not_started', estHours: 9, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 45, ex2_total: 30, ex3_total: 20, ex4_total: 10 } },
         ]
       },
       {
         id: 302,
-        name: 'Coordinate Geometry (Class 11)',
-        phase: 'Phase 1',
+        name: 'Trigonometry',
+        phase: 'Class 11 & 12',
+        topics: [
+            { id: 3012, name: 'Trigonometric Ratios & Identities', status: 'in_progress', estHours: 12, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 50, ex2_total: 35, ex3_total: 20, ex4_total: 10 } },
+            { id: 3018, name: 'Trigonometric Equations', status: 'not_started', estHours: 6, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 30, ex2_total: 20, ex3_total: 10, ex4_total: 5 } },
+            { id: 3019, name: 'Solutions of Triangles', status: 'not_started', estHours: 6, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 25, ex2_total: 15, ex3_total: 10, ex4_total: 5 } },
+            { id: 3045, name: 'Inverse Trigonometric Functions', status: 'not_started', estHours: 6, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 35, ex2_total: 25, ex3_total: 15, ex4_total: 5 } },
+        ]
+      },
+      {
+        id: 303,
+        name: 'Coordinate Geometry',
+        phase: 'Class 11',
         topics: [
           { id: 3021, name: 'Straight Lines', status: 'not_started', estHours: 10, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 50, ex2_total: 35, ex3_total: 20, ex4_total: 10 } },
           { id: 3022, name: 'Circles', status: 'not_started', estHours: 9, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 45, ex2_total: 30, ex3_total: 20, ex4_total: 10 } },
@@ -187,9 +185,9 @@ const INITIAL_SYLLABUS: Subject[] = [
         ]
       },
       {
-        id: 303,
-        name: 'Calculus (Class 11 & 12)',
-        phase: 'Phase 2',
+        id: 304,
+        name: 'Calculus',
+        phase: 'Class 11 & 12',
         topics: [
           { id: 3031, name: 'Limits, Continuity & Differentiability', status: 'not_started', estHours: 12, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 55, ex2_total: 40, ex3_total: 25, ex4_total: 15 } },
           { id: 3032, name: 'Differentiation', status: 'not_started', estHours: 8, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 40, ex2_total: 30, ex3_total: 20, ex4_total: 10 } },
@@ -201,15 +199,12 @@ const INITIAL_SYLLABUS: Subject[] = [
         ]
       },
       {
-        id: 304,
-        name: 'Algebra & Vectors (Class 12)',
-        phase: 'Phase 2',
+        id: 305,
+        name: 'Vectors & 3D Geometry',
+        phase: 'Class 12',
         topics: [
-          { id: 3041, name: 'Matrices & Determinants', status: 'not_started', estHours: 10, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 50, ex2_total: 35, ex3_total: 20, ex4_total: 10 } },
-          { id: 3042, name: 'Probability', status: 'not_started', estHours: 9, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 45, ex2_total: 30, ex3_total: 20, ex4_total: 10 } },
           { id: 3043, name: 'Vector Algebra', status: 'not_started', estHours: 8, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 45, ex2_total: 30, ex3_total: 20, ex4_total: 10 } },
           { id: 3044, name: '3D Geometry', status: 'not_started', estHours: 10, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 50, ex2_total: 35, ex3_total: 25, ex4_total: 15 } },
-          { id: 3045, name: 'Inverse Trigonometric Functions', status: 'not_started', estHours: 6, exercises: { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex1_total: 35, ex2_total: 25, ex3_total: 15, ex4_total: 5 } },
         ]
       }
     ]
