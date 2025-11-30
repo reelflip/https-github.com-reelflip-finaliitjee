@@ -7,6 +7,7 @@ import Syllabus from './components/Syllabus';
 import Analytics from './components/Analytics';
 import TestCenter from './components/TestCenter';
 import ChatTutor from './components/ChatTutor';
+import AdminDocs from './components/AdminDocs';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -29,6 +30,8 @@ const App: React.FC = () => {
       case 'timetable':
         // Reuse TestCenter or create new for demo, reusing ChatTutor as placeholder for advanced features
         return <ChatTutor />; 
+      case 'docs':
+        return <AdminDocs />;
       default:
         return <div className="p-4">Module under construction</div>;
     }

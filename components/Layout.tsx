@@ -7,7 +7,8 @@ import {
   PieChart, 
   Calendar, 
   LogOut, 
-  Users
+  Users,
+  FileText
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -36,6 +37,7 @@ const Layout: React.FC<LayoutProps> = ({ user, activeTab, setActiveTab, onLogout
   const adminNav = [
     { id: 'dashboard', label: 'Admin Panel', icon: LayoutDashboard },
     { id: 'users', label: 'Manage Users', icon: Users },
+    { id: 'docs', label: 'System Docs', icon: FileText },
   ];
 
   const navItems = user.role === 'student' ? studentNav : user.role === 'parent' ? parentNav : adminNav;

@@ -1,11 +1,22 @@
 import { GoogleGenAI } from "@google/genai";
 
-// Safe access to process.env for browser environments where it might be undefined
-const apiKey = (typeof process !== 'undefined' && process.env && process.env.API_KEY) ? process.env.API_KEY : '';
-const ai = new GoogleGenAI({ apiKey });
+// Helper to get safe API key without crashing
+const getApiKey = () => {
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+  return '';
+};
+
+const getAiClient = () => {
+  const key = getApiKey();
+  if (!key) return null;
+  return new GoogleGenAI({ apiKey: key });
+};
 
 export const generateMotivation = async (studentName: string): Promise<string> => {
-  if (!apiKey) return "Keep pushing! Your hard work will pay off.";
+  const ai = getAiClient();
+  if (!ai) return "Keep pushing! Your hard work will pay off.";
   
   try {
     const response = await ai.models.generateContent({
@@ -20,7 +31,8 @@ export const generateMotivation = async (studentName: string): Promise<string> =
 };
 
 export const generateStudyTip = async (subject: string): Promise<string> => {
-  if (!apiKey) return "Focus on solving previous year questions to understand the pattern.";
+  const ai = getAiClient();
+  if (!ai) return "Focus on solving previous year questions to understand the pattern.";
 
   try {
     const response = await ai.models.generateContent({
@@ -35,7 +47,8 @@ export const generateStudyTip = async (subject: string): Promise<string> => {
 };
 
 export const askTutor = async (question: string): Promise<string> => {
-    if (!apiKey) return "Please configure your API Key to use the AI Tutor.";
+    const ai = getAiClient();
+    if (!ai) return "Please configure your API Key to use the AI Tutor. (Mock Mode: Active)";
     
     try {
         const response = await ai.models.generateContent({

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Test, Question } from '../types';
 import { PlayCircle, Clock, CheckCircle } from 'lucide-react';
 
@@ -25,16 +25,47 @@ const TestCenter: React.FC = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isFinished, setIsFinished] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(0);
+
+  // Timer Ticking Effect
+  useEffect(() => {
+    if (!activeTest || isFinished) return;
+
+    const timer = setInterval(() => {
+      setTimeRemaining((prev) => Math.max(0, prev - 1));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [activeTest, isFinished]);
+
+  // Timer Expiry Check
+  useEffect(() => {
+    if (activeTest && !isFinished && timeRemaining === 0) {
+      submitTest();
+    }
+  }, [timeRemaining, activeTest, isFinished]);
 
   const startTest = (test: Test) => {
     setActiveTest(test);
     setIsFinished(false);
     setCurrentQuestionIndex(0);
     setSelectedOption(null);
+    setTimeRemaining(test.duration * 60);
   };
 
   const submitTest = () => {
     setIsFinished(true);
+  };
+
+  const formatTime = (seconds: number) => {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    
+    if (hrs > 0) {
+      return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   if (activeTest) {
@@ -46,9 +77,11 @@ const TestCenter: React.FC = () => {
             <h2 className="font-bold">{activeTest.title}</h2>
             <p className="text-xs text-slate-400">Question {currentQuestionIndex + 1} of {activeTest.questionsCount}</p>
           </div>
-          <div className="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded">
-            <Clock size={16} className="text-blue-400"/>
-            <span className="font-mono">{activeTest.duration}:00</span>
+          <div className={`flex items-center gap-2 px-3 py-1 rounded transition-colors ${
+              timeRemaining < 300 ? 'bg-red-500/20 text-red-200 animate-pulse' : 'bg-slate-800'
+          }`}>
+            <Clock size={16} className={timeRemaining < 300 ? "text-red-400" : "text-blue-400"}/>
+            <span className="font-mono font-medium">{formatTime(timeRemaining)}</span>
           </div>
         </div>
 
@@ -60,7 +93,10 @@ const TestCenter: React.FC = () => {
                  <CheckCircle size={32} />
                </div>
                <h3 className="text-2xl font-bold text-slate-800">Test Submitted!</h3>
-               <p className="text-slate-500 mb-6">Your responses have been recorded for analytics.</p>
+               <p className="text-slate-500 mb-6">
+                   {timeRemaining === 0 ? "Time's up! " : ""}
+                   Your responses have been recorded for analytics.
+               </p>
                <button 
                 onClick={() => setActiveTest(null)}
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"

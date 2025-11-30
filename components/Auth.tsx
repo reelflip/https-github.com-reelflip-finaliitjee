@@ -147,7 +147,7 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                     setErrorMsg('Registration failed. Please try again.');
                 }
             } else {
-                setErrorMsg('Parent registration not implemented in this demo.');
+                setErrorMsg('Parent/Admin registration not implemented in this demo.');
             }
         } else {
             const user = await loginUser(email, password, role);
@@ -215,28 +215,39 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           <form onSubmit={handleSubmit} className="space-y-5">
             
             {/* Role Selection */}
-            <div className="grid grid-cols-2 gap-1 bg-slate-100 p-1.5 rounded-xl mb-6">
+            <div className="grid grid-cols-3 gap-1 bg-slate-100 p-1.5 rounded-xl mb-6">
               <button
                 type="button"
                 onClick={() => setRole('student')}
-                className={`py-2.5 text-sm font-semibold rounded-lg transition-all ${
+                className={`py-2.5 text-xs font-semibold rounded-lg transition-all ${
                   role === 'student' 
                     ? 'bg-white text-blue-700 shadow-sm ring-1 ring-black/5' 
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
               >
-                I am a Student
+                Student
               </button>
               <button
                 type="button"
                 onClick={() => setRole('parent')}
-                className={`py-2.5 text-sm font-semibold rounded-lg transition-all ${
+                className={`py-2.5 text-xs font-semibold rounded-lg transition-all ${
                   role === 'parent' 
                     ? 'bg-white text-blue-700 shadow-sm ring-1 ring-black/5' 
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
               >
-                I am a Parent
+                Parent
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole('admin')}
+                className={`py-2.5 text-xs font-semibold rounded-lg transition-all ${
+                  role === 'admin' 
+                    ? 'bg-white text-blue-700 shadow-sm ring-1 ring-black/5' 
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                Admin
               </button>
             </div>
 
