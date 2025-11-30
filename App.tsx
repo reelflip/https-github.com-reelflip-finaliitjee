@@ -6,8 +6,9 @@ import Dashboard from './components/Dashboard';
 import Syllabus from './components/Syllabus';
 import Analytics from './components/Analytics';
 import TestCenter from './components/TestCenter';
-import ChatTutor from './components/ChatTutor';
+import TimetableGenerator from './components/TimetableGenerator';
 import AdminDocs from './components/AdminDocs';
+import AdminUserManagement from './components/AdminUserManagement';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -28,8 +29,9 @@ const App: React.FC = () => {
       case 'tests':
         return <TestCenter />;
       case 'timetable':
-        // Reuse TestCenter or create new for demo, reusing ChatTutor as placeholder for advanced features
-        return <ChatTutor />; 
+        return <TimetableGenerator />; 
+      case 'users':
+        return <AdminUserManagement />;
       case 'docs':
         return <AdminDocs />;
       default:

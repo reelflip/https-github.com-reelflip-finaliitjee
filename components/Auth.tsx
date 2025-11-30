@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Role } from '../types';
 import { loginUser, registerStudent } from '../services/auth';
 import { 
@@ -48,12 +48,16 @@ const TARGET_YEARS = [
 
 // SQL Schema as a string for client-side download
 const SQL_SCHEMA = `
+-- ==========================================
+-- 1. USER MANAGEMENT
+-- ==========================================
+
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    full_name VARCHAR(100),
-    email VARCHAR(100) UNIQUE,
-    password_hash VARCHAR(255),
-    role ENUM('student','parent','admin'),
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role ENUM('student','parent','admin') NOT NULL,
     recovery_question VARCHAR(255),
     recovery_answer VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -68,12 +72,28 @@ CREATE TABLE students (
 
 CREATE TABLE parents (
     user_id INT PRIMARY KEY,
+    phone VARCHAR(20),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE syllabus_topics (
+CREATE TABLE parent_student_requests (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    parent_id INT,
+    student_id INT,
+    status ENUM('pending','accepted','rejected') DEFAULT 'pending',
+    requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (parent_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- ==========================================
+-- 2. SYLLABUS & TRACKING
+-- ==========================================
+
+CREATE TABLE syllabus_topics (
+    id INT PRIMARY KEY,
     subject VARCHAR(50),
+    chapter_name VARCHAR(100),
     phase VARCHAR(20),
     topic_name VARCHAR(100),
     est_hours INT
@@ -82,10 +102,24 @@ CREATE TABLE syllabus_topics (
 CREATE TABLE student_topic_progress (
     student_id INT,
     topic_id INT,
-    status ENUM('not_started','in_progress','completed'),
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (student_id, topic_id)
+    status ENUM('not_started','in_progress','completed','revision_required') DEFAULT 'not_started',
+    ex1_solved INT DEFAULT 0,
+    ex1_total INT DEFAULT 0,
+    ex2_solved INT DEFAULT 0,
+    ex2_total INT DEFAULT 0,
+    ex3_solved INT DEFAULT 0,
+    ex3_total INT DEFAULT 0,
+    ex4_solved INT DEFAULT 0,
+    ex4_total INT DEFAULT 0,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (student_id, topic_id),
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (topic_id) REFERENCES syllabus_topics(id) ON DELETE CASCADE
 );
+
+-- ==========================================
+-- 3. EXAMS & ANALYTICS
+-- ==========================================
 
 CREATE TABLE tests (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -93,6 +127,7 @@ CREATE TABLE tests (
     type ENUM('mock','pyq'),
     duration INT,
     total_marks INT,
+    questions_count INT,
     published BOOLEAN DEFAULT 0
 );
 
@@ -103,8 +138,35 @@ CREATE TABLE student_test_attempts (
     score INT,
     accuracy FLOAT,
     time_spent INT,
-    attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE
 );
+
+-- ==========================================
+-- 4. UTILITIES
+-- ==========================================
+
+CREATE TABLE planner (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT,
+    date DATE,
+    subject VARCHAR(50),
+    task_type VARCHAR(30),
+    duration INT,
+    status ENUM('pending','done'),
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(100),
+    message TEXT,
+    role_target ENUM('student','parent','all'),
+    publish_date DATE
+);
+
+-- Note: Run the INSERT statements provided in the Admin Panel to populate syllabus data.
 `.trim();
 
 const Auth: React.FC<AuthProps> = ({ onLogin }) => {
@@ -115,12 +177,19 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
   
   // Form fields
   const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('student@example.com');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [institute, setInstitute] = useState(COACHING_INSTITUTES[0]);
   const [targetYear, setTargetYear] = useState(TARGET_YEARS[0]);
   const [recoveryQuestion, setRecoveryQuestion] = useState('What is the name of your first pet?');
   const [recoveryAnswer, setRecoveryAnswer] = useState('');
+
+  // Update default email based on role for demo convenience
+  useEffect(() => {
+    if (role === 'admin') setEmail('admin@iitjee.com');
+    else if (role === 'parent') setEmail('parent@example.com');
+    else setEmail('student@example.com');
+  }, [role]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -333,6 +402,11 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
                   className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-300"
                 />
               </div>
+               {!isRegister && (
+                  <p className="text-[10px] text-slate-400 mt-1.5 ml-1">
+                      Demo Mode: Enter any password
+                  </p>
+               )}
             </div>
 
             {isRegister && (

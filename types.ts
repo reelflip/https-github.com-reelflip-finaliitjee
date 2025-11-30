@@ -5,6 +5,10 @@ export interface User {
   name: string;
   email: string;
   role: Role;
+  // Optional fields for detailed profiles
+  institute?: string;
+  targetYear?: string;
+  phone?: string;
 }
 
 export type TopicStatus = 'not_started' | 'in_progress' | 'completed' | 'revision_required';
@@ -14,6 +18,16 @@ export interface Topic {
   name: string;
   status: TopicStatus;
   estHours: number;
+  exercises: {
+    ex1: number;
+    ex2: number;
+    ex3: number;
+    ex4: number;
+    ex1_total: number;
+    ex2_total: number;
+    ex3_total: number;
+    ex4_total: number;
+  };
 }
 
 export interface Chapter {
