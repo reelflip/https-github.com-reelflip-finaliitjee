@@ -135,6 +135,7 @@ CREATE TABLE student_test_attempts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     student_id INT,
     test_id INT,
+    test_title VARCHAR(255),
     score INT,
     accuracy FLOAT,
     time_spent INT,
