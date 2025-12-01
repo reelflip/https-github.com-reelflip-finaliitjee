@@ -194,7 +194,7 @@ CREATE TABLE study_sessions (
     student_id INT,
     subject VARCHAR(50),
     duration_minutes INT,
-    session_type ENUM('pomodoro', 'deep_work'),
+    session_type ENUM('pomodoro', 'deep_work', 'short_break'),
     recall_notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
