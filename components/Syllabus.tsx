@@ -7,6 +7,7 @@ interface SyllabusProps {
 }
 
 const INITIAL_SYLLABUS: Subject[] = [
+  // ... (Keep existing data structure exactly same, only UI changes below)
   {
     id: 1,
     name: 'Mathematics',
@@ -272,7 +273,7 @@ const Syllabus: React.FC<SyllabusProps> = ({ readOnly = false }) => {
          {/* Welcome / Time */}
          <div className="md:col-span-2 bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex items-center justify-between">
              <div>
-                 <h3 className="text-lg font-bold text-slate-800">Welcome Back, ishan!</h3>
+                 <h3 className="text-lg font-bold text-slate-800">Welcome Back, Student!</h3>
                  <p className="text-sm text-slate-500 mt-1 max-w-md">Consistent effort is the key to cracking JEE with excellence. You have completed {completedTopics} out of {totalTopics} major topics.</p>
              </div>
              <div className="hidden md:block bg-slate-50 px-4 py-2 rounded-lg text-center border border-slate-100">
@@ -298,8 +299,8 @@ const Syllabus: React.FC<SyllabusProps> = ({ readOnly = false }) => {
          </div>
       </div>
 
-      {/* Toolbar */}
-      <div className="flex flex-col md:flex-row gap-4 items-center bg-white p-2 rounded-xl border border-slate-200 shadow-sm sticky top-0 z-20">
+      {/* Toolbar - Responsive Stack */}
+      <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center bg-white p-2 rounded-xl border border-slate-200 shadow-sm sticky top-16 md:top-0 z-10">
          <div className="relative flex-1 w-full">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input 
@@ -311,10 +312,10 @@ const Syllabus: React.FC<SyllabusProps> = ({ readOnly = false }) => {
             />
          </div>
          <div className="h-6 w-[1px] bg-slate-200 hidden md:block"></div>
-         <div className="flex items-center gap-1 w-full md:w-auto overflow-x-auto">
+         <div className="flex items-center gap-1 w-full md:w-auto overflow-x-auto no-scrollbar">
              <button 
                 onClick={() => setActiveSubject('all')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors whitespace-nowrap ${activeSubject === 'all' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors whitespace-nowrap touch-manipulation ${activeSubject === 'all' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
              >
                 All
              </button>
@@ -322,7 +323,7 @@ const Syllabus: React.FC<SyllabusProps> = ({ readOnly = false }) => {
                  <button 
                     key={sub.id}
                     onClick={() => setActiveSubject(sub.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors whitespace-nowrap ${activeSubject === sub.id ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors whitespace-nowrap touch-manipulation ${activeSubject === sub.id ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
                  >
                     {sub.name}
                  </button>
@@ -330,7 +331,7 @@ const Syllabus: React.FC<SyllabusProps> = ({ readOnly = false }) => {
          </div>
          <div className="h-6 w-[1px] bg-slate-200 hidden md:block"></div>
          {!readOnly && (
-             <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 shadow-sm transition-all whitespace-nowrap w-full md:w-auto justify-center">
+             <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 shadow-sm transition-all whitespace-nowrap w-full md:w-auto justify-center touch-manipulation active:scale-[0.98]">
                  <Save size={16} /> Save Changes
              </button>
          )}
@@ -346,42 +347,37 @@ const Syllabus: React.FC<SyllabusProps> = ({ readOnly = false }) => {
                     <div key={chapter.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                         <button 
                         onClick={() => toggleChapter(chapter.id)}
-                        className="w-full flex items-center justify-between p-4 bg-white hover:bg-slate-50 transition-colors"
+                        className="w-full flex items-center justify-between p-4 bg-white hover:bg-slate-50 transition-colors touch-manipulation"
                         >
-                        <div className="flex items-center gap-3">
-                            {expandedChapters.includes(chapter.id) ? <ChevronDown size={18} className="text-slate-400" /> : <ChevronRight size={18} className="text-slate-400" />}
-                            <div className="text-left">
+                        <div className="flex items-center gap-3 overflow-hidden">
+                            {expandedChapters.includes(chapter.id) ? <ChevronDown size={18} className="text-slate-400 shrink-0" /> : <ChevronRight size={18} className="text-slate-400 shrink-0" />}
+                            <div className="text-left overflow-hidden">
                                 <div className="flex items-center gap-2 mb-1">
-                                    <span className={`text-[10px] px-1.5 py-0.5 rounded uppercase font-bold ${
+                                    <span className={`text-[10px] px-1.5 py-0.5 rounded uppercase font-bold shrink-0 ${
                                         subject.name === 'Physics' ? 'bg-purple-100 text-purple-700' : 
                                         subject.name === 'Chemistry' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'
                                     }`}>{subject.name}</span>
-                                    <span className="text-[10px] text-slate-400 font-medium">Phase 1</span>
+                                    <span className="text-[10px] text-slate-400 font-medium truncate">Phase 1</span>
                                 </div>
-                                <h3 className="font-bold text-slate-800 text-base">{chapter.name.split(': ')[1] || chapter.name}</h3>
+                                <h3 className="font-bold text-slate-800 text-base truncate">{chapter.name.split(': ')[1] || chapter.name}</h3>
                                 <div className="flex items-center gap-3 mt-1 text-xs text-slate-400">
-                                    <span>Est. {chapter.topics.reduce((acc, t) => acc + t.estHours, 0)} Hours</span>
-                                    <div className="w-1 h-1 rounded-full bg-slate-300"></div>
+                                    <span className="hidden sm:inline">Est. {chapter.topics.reduce((acc, t) => acc + t.estHours, 0)} Hours</span>
+                                    <div className="w-1 h-1 rounded-full bg-slate-300 hidden sm:block"></div>
                                     <span className="flex items-center gap-1">
                                         <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                                             <div className="bg-green-500 h-full rounded-full" style={{ width: `${(chapter.topics.filter(t => t.status === 'completed').length / chapter.topics.length) * 100}%` }}></div>
                                         </div>
-                                        {Math.round((chapter.topics.filter(t => t.status === 'completed').length / chapter.topics.length) * 100)}% Questions
+                                        {Math.round((chapter.topics.filter(t => t.status === 'completed').length / chapter.topics.length) * 100)}%
                                     </span>
                                 </div>
                             </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="hidden sm:flex items-center gap-2">
                              <div className={`px-3 py-1 rounded text-xs font-bold ${
                                  chapter.topics.every(t => t.status === 'completed') ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'
                              }`}>
                                  {chapter.topics.every(t => t.status === 'completed') ? 'Completed' : 'In Progress'}
                              </div>
-                             {expandedChapters.includes(chapter.id) ? (
-                                 <span className="text-xs font-medium text-blue-600 underline">Hide</span>
-                             ) : (
-                                 <span className="text-xs font-medium text-blue-600 underline">Details</span>
-                             )}
                         </div>
                         </button>
 
@@ -393,22 +389,22 @@ const Syllabus: React.FC<SyllabusProps> = ({ readOnly = false }) => {
                                 {/* Topic Info */}
                                 <div className="flex items-center gap-3 min-w-[250px]">
                                 {topic.status === 'completed' 
-                                    ? <CheckCircle2 size={20} className="text-green-500" />
+                                    ? <CheckCircle2 size={20} className="text-green-500 shrink-0" />
                                     : topic.status === 'revision_required'
-                                    ? <Circle size={20} className="text-orange-500" />
-                                    : <Circle size={20} className="text-slate-300" />
+                                    ? <Circle size={20} className="text-orange-500 shrink-0" />
+                                    : <Circle size={20} className="text-slate-300 shrink-0" />
                                 }
                                 <div>
-                                    <p className="font-medium text-slate-700">{topic.name}</p>
+                                    <p className="font-medium text-slate-700 text-sm md:text-base">{topic.name}</p>
                                     <p className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
                                     <Clock size={10} /> {topic.estHours} hrs estimated
                                     </p>
                                 </div>
                                 </div>
 
-                                <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                                    {/* Exercise Inputs */}
-                                    <div className={`flex items-center gap-2 bg-white p-2 rounded-lg border border-slate-200 overflow-x-auto max-w-full ${readOnly ? 'opacity-80' : ''}`}>
+                                <div className="flex flex-col md:flex-row items-start md:items-center gap-6 w-full md:w-auto">
+                                    {/* Exercise Inputs - Scrollable on Mobile */}
+                                    <div className={`flex items-center gap-2 bg-white p-2 rounded-lg border border-slate-200 overflow-x-auto w-full md:w-auto max-w-full ${readOnly ? 'opacity-80' : ''}`}>
                                         <div className="flex items-center gap-1 text-slate-400 mr-2 border-r border-slate-200 pr-2 shrink-0">
                                             <PenTool size={12} />
                                             <div className="flex flex-col">
@@ -419,29 +415,27 @@ const Syllabus: React.FC<SyllabusProps> = ({ readOnly = false }) => {
                                         {(['ex1', 'ex2', 'ex3', 'ex4'] as const).map((ex, idx) => {
                                             const totalKey = `${ex}_total` as keyof Topic['exercises'];
                                             return (
-                                                <div key={ex} className="flex flex-col items-center gap-1 shrink-0">
+                                                <div key={ex} className="flex flex-col items-center gap-1 shrink-0 min-w-[40px]">
                                                     <label className="text-[9px] text-slate-400 uppercase font-bold mb-0.5">Ex {idx+1}</label>
                                                     <input
                                                         type="number"
                                                         min="0"
                                                         placeholder="0"
                                                         disabled={readOnly}
-                                                        className="w-10 h-6 text-center text-xs border border-slate-200 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-200 outline-none transition-all bg-white disabled:bg-slate-50 disabled:text-slate-500 font-bold text-slate-700"
+                                                        className="w-10 h-6 text-center text-xs border border-slate-200 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-200 outline-none transition-all bg-white disabled:bg-slate-50 disabled:text-slate-500 font-bold text-slate-700 touch-manipulation"
                                                         value={topic.exercises[ex] || ''}
                                                         onChange={(e) => updateExercise(chapter.id, topic.id, ex, e.target.value)}
                                                         onClick={(e) => (e.target as HTMLInputElement).select()}
-                                                        title="Solved"
                                                     />
                                                     <input
                                                         type="number"
                                                         min="0"
                                                         placeholder="0"
                                                         disabled={readOnly}
-                                                        className="w-10 h-6 text-center text-[10px] border border-slate-200 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-200 outline-none transition-all bg-slate-50 text-slate-400 disabled:opacity-70"
+                                                        className="w-10 h-6 text-center text-[10px] border border-slate-200 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-200 outline-none transition-all bg-slate-50 text-slate-400 disabled:opacity-70 touch-manipulation"
                                                         value={topic.exercises[totalKey] || ''}
                                                         onChange={(e) => updateExercise(chapter.id, topic.id, totalKey, e.target.value)}
                                                         onClick={(e) => (e.target as HTMLInputElement).select()}
-                                                        title="Total Questions"
                                                     />
                                                 </div>
                                             );
@@ -449,12 +443,12 @@ const Syllabus: React.FC<SyllabusProps> = ({ readOnly = false }) => {
                                     </div>
 
                                     {/* Status Dropdown */}
-                                    <div className="flex items-center gap-3 shrink-0">
+                                    <div className="flex items-center gap-3 shrink-0 w-full md:w-auto justify-between md:justify-start">
                                     <select 
                                         value={topic.status}
                                         disabled={readOnly}
                                         onChange={(e) => updateStatus(chapter.id, topic.id, e.target.value as TopicStatus)}
-                                        className="text-sm border border-slate-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-slate-100 disabled:text-slate-500 bg-white"
+                                        className="text-sm border border-slate-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-slate-100 disabled:text-slate-500 bg-white flex-1 md:flex-none"
                                     >
                                         <option value="not_started">Not Started</option>
                                         <option value="in_progress">In Progress</option>
