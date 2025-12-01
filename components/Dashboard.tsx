@@ -6,15 +6,10 @@ import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
 
 interface DashboardProps {
   user: User;
+  notifications: Notification[];
 }
 
-const MOCK_NOTIFICATIONS: Notification[] = [
-  { id: 1, title: 'Physics Mock Test', message: 'Full syllabus mock test available tomorrow.', date: '2023-10-25', type: 'alert' },
-  { id: 2, title: 'Syllabus Update', message: 'Admin added new questions to Rotational Motion.', date: '2023-10-24', type: 'reminder' },
-  { id: 3, title: 'Parent Connection', message: 'Your parent viewed your progress report.', date: '2023-10-23', type: 'invite' },
-];
-
-const Dashboard: React.FC<DashboardProps> = ({ user }) => {
+const Dashboard: React.FC<DashboardProps> = ({ user, notifications }) => {
   const [motivation, setMotivation] = useState<string>('Loading daily motivation...');
   const [tip, setTip] = useState<string>('Loading study tip...');
   
@@ -132,12 +127,12 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
         </div>
 
         {/* Notifications */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 overflow-y-auto">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 overflow-y-auto max-h-[300px]">
              <h3 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
                 <Clock size={18} className="text-orange-500"/> Updates
             </h3>
             <div className="space-y-4">
-                {MOCK_NOTIFICATIONS.map(notif => (
+                {notifications.map(notif => (
                     <div key={notif.id} className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100 hover:bg-slate-100 transition-colors">
                         <AlertCircle size={16} className={`mt-0.5 ${notif.type === 'alert' ? 'text-red-500' : 'text-blue-500'}`} />
                         <div>

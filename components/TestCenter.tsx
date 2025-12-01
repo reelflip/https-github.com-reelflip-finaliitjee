@@ -1,40 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { Test, Question, User } from '../types';
-import { PlayCircle, Clock, CheckCircle, Plus, Save, Trash2, X, FileText, List, ChevronRight, Database, Search, Filter, ShieldCheck } from 'lucide-react';
+import { Test, Question, User, TestAttempt } from '../types';
+import { PlayCircle, Clock, CheckCircle, Plus, Save, Trash2, X, FileText, List, ChevronRight, Database, Search, Filter, ShieldCheck, History } from 'lucide-react';
 
 interface TestCenterProps {
     user: User;
+    tests: Test[];
+    setTests: (test: Test) => void;
+    questionBank: Question[];
+    setQuestionBank: (questions: Question[]) => void;
+    testAttempts: TestAttempt[];
+    onTestComplete: (attempt: TestAttempt) => void;
 }
 
-// 1. Initial "Server File" Data (Simulated)
-const MOCK_QUESTION_BANK: Question[] = [
-    { id: 101, text: "A particle of mass m moves in a circular orbit...", options: ["L", "2L", "L/2", "4L"], correctOption: 0, subject: "Physics", topic: "Rotational Motion" },
-    { id: 102, text: "The dimensions of magnetic flux are:", options: ["[ML2T-2A-1]", "[ML2T-2A-2]", "[MLT-2A-1]", "[MLT-1A-1]"], correctOption: 0, subject: "Physics", topic: "Magnetism" },
-    { id: 103, text: "Which of the following is diamagnetic?", options: ["Oxygen", "Nitrogen", "Iron", "Cobalt"], correctOption: 1, subject: "Chemistry", topic: "Magnetism" },
-    { id: 104, text: "Integration of log(x) dx is:", options: ["x log x - x + C", "x log x + x + C", "log x - x + C", "1/x + C"], correctOption: 0, subject: "Maths", topic: "Calculus" },
-    { id: 105, text: "The number of sigma and pi bonds in benzene are:", options: ["12, 3", "6, 3", "12, 6", "6, 6"], correctOption: 0, subject: "Chemistry", topic: "Organic" },
-];
-
-const INITIAL_TESTS: Test[] = [
-  { id: 1, title: 'JEE Main Full Mock 1', type: 'mock', duration: 180, totalMarks: 300, questionsCount: 5 },
-  { id: 2, title: 'Physics - Rotational Mechanics', type: 'mock', duration: 60, totalMarks: 100, questionsCount: 2 },
-];
-
-const TestCenter: React.FC<TestCenterProps> = ({ user }) => {
-  // Global State
-  const [tests, setTests] = useState<Test[]>(INITIAL_TESTS);
-  const [questionBank, setQuestionBank] = useState<Question[]>(MOCK_QUESTION_BANK);
+const TestCenter: React.FC<TestCenterProps> = ({ 
+    user, 
+    tests, 
+    setTests, 
+    questionBank, 
+    setQuestionBank, 
+    testAttempts,
+    onTestComplete 
+}) => {
   
   // Navigation State
-  const [view, setView] = useState<'list' | 'take' | 'create' | 'bank'>('list');
+  const [view, setView] = useState<'list' | 'take' | 'create' | 'bank' | 'history'>('list');
   
   // --- Taking Test State ---
   const [activeTest, setActiveTest] = useState<Test | null>(null);
-  const [testQuestions, setTestQuestions] = useState<Question[]>([]); // Subset for the active test
+  const [testQuestions, setTestQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [answers, setAnswers] = useState<Record<number, number>>({}); // qId -> optionIndex
   const [isFinished, setIsFinished] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(0);
+  const [scoreResult, setScoreResult] = useState<{score: number, accuracy: number} | null>(null);
 
   // --- Creating Test State ---
   const [newTestMeta, setNewTestMeta] = useState<Partial<Test>>({ title: '', type: 'mock', duration: 180, totalMarks: 300 });
@@ -73,20 +71,69 @@ const TestCenter: React.FC<TestCenterProps> = ({ user }) => {
 
   // --- ACTIONS: STUDENT ---
   const startTest = (test: Test) => {
-    // In a real app, we would fetch specific questions for this test ID from the server
-    // For demo, we just pick random questions from the bank matching the count
-    const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
-    setTestQuestions(shuffled.slice(0, test.questionsCount));
+    let qList: Question[] = [];
+
+    // If test has specific questions linked, use them
+    if (test.questionIds && test.questionIds.length > 0) {
+        qList = questionBank.filter(q => test.questionIds?.includes(q.id));
+    } else {
+        // Legacy/Random fallback
+        const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
+        qList = shuffled.slice(0, test.questionsCount);
+    }
     
+    setTestQuestions(qList);
     setActiveTest(test);
     setIsFinished(false);
     setCurrentQuestionIndex(0);
-    setSelectedOption(null);
+    setAnswers({});
+    setScoreResult(null);
     setTimeRemaining(test.duration * 60);
     setView('take');
   };
 
+  const handleOptionSelect = (qId: number, optionIdx: number) => {
+      setAnswers(prev => ({ ...prev, [qId]: optionIdx }));
+  };
+
   const submitTest = () => {
+    if (!activeTest) return;
+
+    let score = 0;
+    let correctCount = 0;
+    let attemptedCount = 0;
+
+    testQuestions.forEach(q => {
+        const userAns = answers[q.id];
+        if (userAns !== undefined) {
+            attemptedCount++;
+            if (userAns === q.correctOption) {
+                score += 4; // JEE Pattern: +4
+                correctCount++;
+            } else {
+                score -= 1; // JEE Pattern: -1
+            }
+        }
+    });
+
+    const accuracy = attemptedCount > 0 ? (correctCount / attemptedCount) * 100 : 0;
+    const timeSpent = (activeTest.duration * 60) - timeRemaining;
+
+    // Save Attempt
+    const attempt: TestAttempt = {
+        id: Date.now(),
+        studentId: user.id,
+        testId: activeTest.id,
+        testTitle: activeTest.title,
+        score: Math.max(0, score), // Ensure no negative total in UI if preferred, though JEE allows negative
+        totalMarks: activeTest.questionsCount * 4,
+        accuracy: Math.round(accuracy),
+        timeSpent: timeSpent,
+        date: new Date().toISOString().split('T')[0]
+    };
+
+    onTestComplete(attempt);
+    setScoreResult({ score: score, accuracy: accuracy });
     setIsFinished(true);
   };
 
@@ -104,7 +151,7 @@ const TestCenter: React.FC<TestCenterProps> = ({ user }) => {
           subject: newBankQuestion.subject,
           topic: newBankQuestion.topic
       };
-      setQuestionBank(prev => [...prev, q]);
+      setQuestionBank([...questionBank, q]);
       setNewBankQuestion({ text: '', options: ['', '', '', ''], correctOption: 0, subject: 'Physics', topic: '' });
       alert("Question added to Bank successfully!");
   };
@@ -126,10 +173,11 @@ const TestCenter: React.FC<TestCenterProps> = ({ user }) => {
           title: newTestMeta.title!,
           type: newTestMeta.type as 'mock' | 'pyq',
           duration: newTestMeta.duration || 180,
-          totalMarks: newTestMeta.totalMarks || 300,
-          questionsCount: selectedQuestionIds.length
+          totalMarks: selectedQuestionIds.length * 4, // Auto calc based on +4
+          questionsCount: selectedQuestionIds.length,
+          questionIds: selectedQuestionIds
       };
-      setTests(prev => [...prev, newTest]);
+      setTests(newTest);
       setView('list');
       setNewTestMeta({ title: '', type: 'mock', duration: 180, totalMarks: 300 });
       setSelectedQuestionIds([]);
@@ -144,25 +192,65 @@ const TestCenter: React.FC<TestCenterProps> = ({ user }) => {
           <div className="bg-slate-900 text-white p-4 flex justify-between items-center shrink-0">
             <div>
               <h2 className="font-bold">{activeTest.title}</h2>
-              <p className="text-xs text-slate-400">Question {currentQuestionIndex + 1} of {activeTest.questionsCount}</p>
+              <p className="text-xs text-slate-400">
+                  {isFinished ? 'Result Summary' : `Question ${currentQuestionIndex + 1} of ${activeTest.questionsCount}`}
+              </p>
             </div>
-            <div className={`flex items-center gap-2 px-3 py-1 rounded transition-colors ${
-                timeRemaining < 300 ? 'bg-red-500/20 text-red-200 animate-pulse' : 'bg-slate-800'
-            }`}>
-              <Clock size={16} className={timeRemaining < 300 ? "text-red-400" : "text-blue-400"}/>
-              <span className="font-mono font-medium">{formatTime(timeRemaining)}</span>
-            </div>
+            {!isFinished && (
+                <div className={`flex items-center gap-2 px-3 py-1 rounded transition-colors ${
+                    timeRemaining < 300 ? 'bg-red-500/20 text-red-200 animate-pulse' : 'bg-slate-800'
+                }`}>
+                <Clock size={16} className={timeRemaining < 300 ? "text-red-400" : "text-blue-400"}/>
+                <span className="font-mono font-medium">{formatTime(timeRemaining)}</span>
+                </div>
+            )}
           </div>
   
           <div className="flex-1 p-8 overflow-y-auto">
-            {isFinished ? (
-               <div className="text-center py-12">
-                 <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                   <CheckCircle size={32} />
+            {isFinished && scoreResult ? (
+               <div className="max-w-3xl mx-auto text-center py-8">
+                 <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                   <CheckCircle size={40} />
                  </div>
-                 <h3 className="text-2xl font-bold text-slate-800">Test Submitted!</h3>
-                 <p className="text-slate-500 mb-6">Responses recorded for analytics.</p>
-                 <button onClick={() => { setActiveTest(null); setView('list'); }} className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Back to Dashboard</button>
+                 <h3 className="text-3xl font-bold text-slate-800 mb-2">Test Submitted!</h3>
+                 <div className="grid grid-cols-3 gap-6 my-8">
+                     <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                         <p className="text-slate-500 text-xs uppercase font-bold">Score</p>
+                         <p className="text-3xl font-bold text-blue-600">{scoreResult.score} <span className="text-sm text-slate-400">/ {activeTest.totalMarks}</span></p>
+                     </div>
+                     <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                         <p className="text-slate-500 text-xs uppercase font-bold">Accuracy</p>
+                         <p className="text-3xl font-bold text-purple-600">{scoreResult.accuracy.toFixed(1)}%</p>
+                     </div>
+                     <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                         <p className="text-slate-500 text-xs uppercase font-bold">Questions</p>
+                         <p className="text-3xl font-bold text-slate-700">{Object.keys(answers).length}/{activeTest.questionsCount}</p>
+                     </div>
+                 </div>
+                 
+                 {/* Question Review */}
+                 <div className="text-left space-y-4">
+                     <h4 className="font-bold text-slate-700 border-b pb-2">Question Breakdown</h4>
+                     {testQuestions.map((q, idx) => {
+                         const userAns = answers[q.id];
+                         const isCorrect = userAns === q.correctOption;
+                         const isSkipped = userAns === undefined;
+                         return (
+                             <div key={q.id} className={`p-4 rounded-lg border ${isCorrect ? 'bg-green-50 border-green-200' : isSkipped ? 'bg-slate-50 border-slate-200' : 'bg-red-50 border-red-200'}`}>
+                                 <div className="flex justify-between mb-2">
+                                     <span className="font-bold text-xs text-slate-500">Q{idx+1}</span>
+                                     <span className={`text-xs font-bold px-2 py-0.5 rounded ${isCorrect ? 'bg-green-200 text-green-800' : isSkipped ? 'bg-slate-200 text-slate-600' : 'bg-red-200 text-red-800'}`}>
+                                         {isCorrect ? '+4 Marks' : isSkipped ? '0 Marks' : '-1 Mark'}
+                                     </span>
+                                 </div>
+                                 <p className="text-sm text-slate-800 font-medium mb-2">{q.text}</p>
+                                 <p className="text-xs text-slate-500">Correct Answer: Option {String.fromCharCode(65 + q.correctOption)}</p>
+                             </div>
+                         )
+                     })}
+                 </div>
+
+                 <button onClick={() => { setActiveTest(null); setView('list'); }} className="mt-8 px-8 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow-lg">Return to Dashboard</button>
                </div>
             ) : currentQ ? (
               <div className="max-w-3xl mx-auto">
@@ -176,9 +264,9 @@ const TestCenter: React.FC<TestCenterProps> = ({ user }) => {
                   {currentQ.options.map((opt, idx) => (
                     <button
                       key={idx}
-                      onClick={() => setSelectedOption(idx)}
+                      onClick={() => handleOptionSelect(currentQ.id, idx)}
                       className={`w-full text-left p-4 rounded-lg border transition-all ${
-                        selectedOption === idx ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-slate-200 hover:bg-slate-50'
+                        answers[currentQ.id] === idx ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-slate-200 hover:bg-slate-50'
                       }`}
                     >
                       <span className="font-semibold mr-3 text-slate-500">{String.fromCharCode(65 + idx)}.</span>{opt}
@@ -193,9 +281,9 @@ const TestCenter: React.FC<TestCenterProps> = ({ user }) => {
             <div className="p-4 border-t border-slate-200 flex justify-between bg-slate-50 shrink-0">
               <button disabled={currentQuestionIndex === 0} onClick={() => setCurrentQuestionIndex(p => p - 1)} className="px-4 py-2 text-slate-600 hover:bg-slate-200 rounded-lg disabled:opacity-50">Previous</button>
               {currentQuestionIndex < activeTest.questionsCount - 1 ? (
-                 <button onClick={() => { setCurrentQuestionIndex(p => p + 1); setSelectedOption(null); }} className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save & Next</button>
+                 <button onClick={() => setCurrentQuestionIndex(p => p + 1)} className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Next Question</button>
               ) : (
-                <button onClick={submitTest} className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Submit Test</button>
+                <button onClick={submitTest} className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 shadow-lg shadow-green-500/20">Submit Test</button>
               )}
             </div>
           )}
@@ -203,7 +291,7 @@ const TestCenter: React.FC<TestCenterProps> = ({ user }) => {
       );
   }
 
-  // --- BANK VIEW ---
+  // --- BANK & CREATE VIEWS REMAIN MOSTLY SAME, JUST UPDATED PROPS ---
   if (view === 'bank') {
       return (
         <div className="space-y-6 max-w-4xl mx-auto animate-fade-in">
@@ -211,8 +299,8 @@ const TestCenter: React.FC<TestCenterProps> = ({ user }) => {
                 <h2 className="text-2xl font-bold text-slate-800">Question Bank Manager</h2>
                 <button onClick={() => setView('list')} className="text-slate-500 hover:text-slate-700"><X size={24} /></button>
             </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            {/* Same Bank UI as before... simplified for XML brevity but fully functional in logic */}
+             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                 <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2"><Plus size={18}/> Add New Question</h3>
                 <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
@@ -266,7 +354,6 @@ const TestCenter: React.FC<TestCenterProps> = ({ user }) => {
                 </div>
                 <button onClick={addToBank} className="w-full py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800">Save to Bank</button>
             </div>
-
             <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
                 <h3 className="font-bold text-slate-700 mb-2">Existing Questions ({questionBank.length})</h3>
                 <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -281,7 +368,6 @@ const TestCenter: React.FC<TestCenterProps> = ({ user }) => {
       );
   }
 
-  // --- CREATE TEST VIEW ---
   if (view === 'create') {
       const filteredBank = questionBank.filter(q => {
           const matchSub = subjectFilter === 'All' || q.subject === subjectFilter;
@@ -291,6 +377,7 @@ const TestCenter: React.FC<TestCenterProps> = ({ user }) => {
 
       return (
         <div className="h-[calc(100vh-8rem)] flex flex-col animate-fade-in">
+            {/* Same Create UI... */}
              <div className="flex items-center justify-between mb-4 shrink-0">
                 <h2 className="text-2xl font-bold text-slate-800">Test Creator</h2>
                 <div className="flex gap-2">
@@ -317,8 +404,8 @@ const TestCenter: React.FC<TestCenterProps> = ({ user }) => {
                                     <input type="number" value={newTestMeta.duration} onChange={e => setNewTestMeta({...newTestMeta, duration: Number(e.target.value)})} className="w-full px-3 py-2 border rounded-lg" />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Marks</label>
-                                    <input type="number" value={newTestMeta.totalMarks} onChange={e => setNewTestMeta({...newTestMeta, totalMarks: Number(e.target.value)})} className="w-full px-3 py-2 border rounded-lg" />
+                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Qs</label>
+                                    <input type="number" value={selectedQuestionIds.length} disabled className="w-full px-3 py-2 border rounded-lg bg-slate-50" />
                                 </div>
                             </div>
                         </div>
@@ -340,7 +427,6 @@ const TestCenter: React.FC<TestCenterProps> = ({ user }) => {
                                      </div>
                                  ) : null;
                              })}
-                             {selectedQuestionIds.length === 0 && <p className="text-slate-400 text-sm italic text-center py-4">Select questions from the bank.</p>}
                         </div>
                     </div>
                 </div>
@@ -380,6 +466,48 @@ const TestCenter: React.FC<TestCenterProps> = ({ user }) => {
       );
   }
 
+  // --- HISTORY VIEW ---
+  if (view === 'history') {
+      return (
+        <div className="space-y-6">
+            <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-slate-800">Past Results</h2>
+                <button onClick={() => setView('list')} className="text-blue-600 hover:text-blue-800 text-sm font-bold flex items-center gap-1">Back to Tests <ChevronRight size={16}/></button>
+            </div>
+            
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <table className="w-full text-left">
+                    <thead className="bg-slate-50 border-b border-slate-200 text-xs uppercase text-slate-500">
+                        <tr>
+                            <th className="p-4">Test Name</th>
+                            <th className="p-4">Date</th>
+                            <th className="p-4">Score</th>
+                            <th className="p-4">Accuracy</th>
+                            <th className="p-4">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                        {testAttempts.map(attempt => (
+                            <tr key={attempt.id} className="hover:bg-slate-50">
+                                <td className="p-4 font-medium text-slate-800">{attempt.testTitle}</td>
+                                <td className="p-4 text-slate-500 text-sm">{attempt.date}</td>
+                                <td className="p-4 font-bold text-blue-600">{attempt.score} / {attempt.totalMarks}</td>
+                                <td className="p-4 text-slate-600">{attempt.accuracy.toFixed(1)}%</td>
+                                <td className="p-4"><span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-bold uppercase">Completed</span></td>
+                            </tr>
+                        ))}
+                        {testAttempts.length === 0 && (
+                            <tr>
+                                <td colSpan={5} className="p-8 text-center text-slate-400">No past attempts found. Take a test first!</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+      );
+  }
+
   // --- LIST VIEW ---
   return (
     <div className="space-y-6">
@@ -396,6 +524,9 @@ const TestCenter: React.FC<TestCenterProps> = ({ user }) => {
           <p className="text-slate-500">Attempt mocks and previous year papers.</p>
         </div>
         <div className="flex items-center gap-4">
+            <button onClick={() => setView('history')} className="flex items-center gap-2 text-slate-600 hover:text-blue-600 font-medium text-sm mr-2">
+                <History size={18} /> Past Results
+            </button>
             {user.role === 'admin' && (
                 <>
                 <button onClick={() => setView('bank')} className="flex items-center gap-2 bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors">

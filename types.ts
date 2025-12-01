@@ -50,6 +50,7 @@ export interface Test {
   duration: number; // minutes
   totalMarks: number;
   questionsCount: number;
+  questionIds?: number[]; // IDs of specific questions from the bank
 }
 
 export interface Question {
@@ -59,6 +60,18 @@ export interface Question {
   correctOption: number;
   subject?: string;
   topic?: string;
+}
+
+export interface TestAttempt {
+  id: number;
+  studentId: number;
+  testId: number;
+  testTitle: string;
+  score: number;
+  totalMarks: number;
+  accuracy: number;
+  timeSpent: number; // seconds
+  date: string;
 }
 
 export interface Notification {
