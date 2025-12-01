@@ -43,6 +43,7 @@ const Layout: React.FC<LayoutProps> = ({ user, activeTab, setActiveTab, onLogout
   const adminNav = [
     { id: 'dashboard', label: 'Admin Panel', icon: LayoutDashboard },
     { id: 'users', label: 'Manage Users', icon: Users },
+    { id: 'tests', label: 'Mock Exams', icon: PenTool },
     { id: 'docs', label: 'System Docs', icon: FileText },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];

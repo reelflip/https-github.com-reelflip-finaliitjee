@@ -39,7 +39,7 @@ const App: React.FC = () => {
       case 'docs':
         return <AdminDocs />;
       case 'settings':
-        return <Settings user={user} />;
+        return <Settings user={user} onUpdateUser={setUser} />;
       default:
         return <div className="p-4">Module under construction</div>;
     }
