@@ -1,7 +1,14 @@
-import React, { useState } from 'react';
-import { Clock, BookOpen, Building2, Moon, CalendarClock, Loader2 } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Clock, BookOpen, Building2, Moon, CalendarClock, Loader2, Coffee, Zap, ChevronDown, CheckCircle2 } from 'lucide-react';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+interface ScheduleBlock {
+  time: string;
+  activity: string;
+  type: 'fixed' | 'study' | 'break' | 'sleep';
+  duration?: string;
+}
 
 const TimetableGenerator: React.FC = () => {
   // State for Coaching
@@ -19,6 +26,8 @@ const TimetableGenerator: React.FC = () => {
   const [bedTime, setBedTime] = useState('23:00');
 
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedSchedule, setGeneratedSchedule] = useState<ScheduleBlock[] | null>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
 
   const toggleDay = (day: string) => {
     setCoachingDays(prev => 
@@ -28,17 +37,72 @@ const TimetableGenerator: React.FC = () => {
     );
   };
 
+  const generateDailySchedule = () => {
+    // Simple logic to generate a typical day based on constraints
+    // In a real app, this would calculate time gaps dynamically using Date objects
+    
+    const schedule: ScheduleBlock[] = [];
+
+    // Morning
+    schedule.push({ time: wakeTime, activity: 'Wake Up & Morning Routine', type: 'break' });
+    
+    // Early Study Slot (if enough time before school)
+    schedule.push({ time: addMinutes(wakeTime, 45), activity: 'Quick Revision (Formulas/Notes)', type: 'study', duration: '45m' });
+
+    // School Block
+    if (schoolEnabled) {
+        schedule.push({ time: schoolStart, activity: 'School / College', type: 'fixed', duration: '6h' });
+        // After School
+        schedule.push({ time: schoolEnd, activity: 'Lunch & Power Nap', type: 'break', duration: '1h' });
+        schedule.push({ time: addMinutes(schoolEnd, 60), activity: 'Self Study: Problem Solving', type: 'study', duration: '2h' });
+    } else {
+        // Full Day Self Study Structure
+        schedule.push({ time: addMinutes(wakeTime, 90), activity: 'Deep Work Session 1 (Physics)', type: 'study', duration: '3h' });
+        schedule.push({ time: '12:00', activity: 'Lunch Break', type: 'break', duration: '1h' });
+        schedule.push({ time: '13:00', activity: 'Deep Work Session 2 (Maths)', type: 'study', duration: '3h' });
+    }
+
+    // Coaching Block
+    schedule.push({ time: coachingStart, activity: 'Coaching Classes', type: 'fixed', duration: '3h' });
+
+    // Evening
+    schedule.push({ time: coachingEnd, activity: 'Dinner & Relax', type: 'break', duration: '45m' });
+    
+    // Late Night Study
+    schedule.push({ time: addMinutes(coachingEnd, 60), activity: 'Self Study: Review & Homework', type: 'study', duration: '1.5h' });
+
+    // Sleep
+    schedule.push({ time: bedTime, activity: 'Sleep', type: 'sleep' });
+
+    return schedule;
+  };
+
+  // Helper to simulate time addition for display
+  const addMinutes = (time: string, mins: number) => {
+    // Very basic string manipulation for demo purposes
+    // Returns a dummy time string roughly calculated
+    const [h, m] = time.split(':').map(Number);
+    let newM = m + mins;
+    let newH = h + Math.floor(newM / 60);
+    newM = newM % 60;
+    return `${newH.toString().padStart(2, '0')}:${newM.toString().padStart(2, '0')}`;
+  };
+
   const handleGenerate = () => {
     setIsGenerating(true);
-    // Simulate generation delay
+    setGeneratedSchedule(null); // Clear previous
+
     setTimeout(() => {
+        const schedule = generateDailySchedule();
+        setGeneratedSchedule(schedule);
         setIsGenerating(false);
-        alert('Timetable generated successfully based on your constraints!');
-    }, 1500);
+        // Scroll to result
+        setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+    }, 1000);
   };
 
   return (
-    <div className="max-w-3xl mx-auto font-sans">
+    <div className="max-w-4xl mx-auto font-sans space-y-8 pb-12">
       <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-slate-100">
         
         {/* Header */}
@@ -202,19 +266,114 @@ const TimetableGenerator: React.FC = () => {
                 {isGenerating ? (
                     <>
                     <Loader2 size={18} className="animate-spin" />
-                    Generating...
+                    Calculating Best Slots...
                     </>
                 ) : (
                     <>
                     <CalendarClock size={18} />
-                    Generate Timetable
+                    {generatedSchedule ? 'Regenerate Timetable' : 'Generate Timetable'}
                     </>
                 )}
             </button>
           </div>
-
         </div>
       </div>
+
+      {/* RESULT SECTION */}
+      {generatedSchedule && (
+        <div ref={resultRef} className="bg-white rounded-xl shadow-xl overflow-hidden border border-slate-100 animate-fade-in-up">
+            <div className="bg-slate-50 p-6 border-b border-slate-100 flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                    <CheckCircle2 size={24} className="text-green-500" />
+                    <h2 className="text-lg font-bold text-slate-800">Your Personalized Schedule</h2>
+                </div>
+                <div className="text-xs font-medium text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200">
+                    Typical Weekday
+                </div>
+            </div>
+            
+            <div className="p-0">
+                <div className="relative">
+                    {/* Vertical Line */}
+                    <div className="absolute left-24 top-0 bottom-0 w-px bg-slate-100"></div>
+
+                    {generatedSchedule.map((block, index) => {
+                        let bgClass = "bg-white";
+                        let borderClass = "border-slate-100";
+                        let textClass = "text-slate-800";
+                        let Icon = Clock;
+
+                        if (block.type === 'study') {
+                            bgClass = "bg-blue-50";
+                            borderClass = "border-blue-100";
+                            textClass = "text-blue-800";
+                            Icon = Zap;
+                        } else if (block.type === 'fixed') {
+                            bgClass = "bg-slate-100";
+                            borderClass = "border-slate-200";
+                            textClass = "text-slate-600";
+                            Icon = Building2;
+                        } else if (block.type === 'sleep') {
+                            bgClass = "bg-indigo-900";
+                            borderClass = "border-indigo-800";
+                            textClass = "text-indigo-100";
+                            Icon = Moon;
+                        } else { // break
+                            bgClass = "bg-orange-50";
+                            borderClass = "border-orange-100";
+                            textClass = "text-orange-800";
+                            Icon = Coffee;
+                        }
+
+                        return (
+                            <div key={index} className="flex group">
+                                {/* Time Column */}
+                                <div className="w-24 shrink-0 py-6 pr-6 text-right relative">
+                                    <span className="text-sm font-bold text-slate-600 font-mono">{block.time}</span>
+                                    {/* Dot on timeline */}
+                                    <div className={`absolute right-[-4px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full border-2 border-white ring-1 ring-slate-200 ${block.type === 'study' ? 'bg-blue-500' : 'bg-slate-300'}`}></div>
+                                </div>
+                                
+                                {/* Content Column */}
+                                <div className="flex-1 py-4 pr-6">
+                                    <div className={`p-4 rounded-xl border ${bgClass} ${borderClass} transition-transform group-hover:translate-x-1`}>
+                                        <div className="flex items-center justify-between mb-1">
+                                            <div className={`flex items-center gap-2 font-bold ${textClass}`}>
+                                                <Icon size={16} />
+                                                {block.activity}
+                                            </div>
+                                            {block.duration && (
+                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/50 border border-black/5 opacity-70`}>
+                                                    {block.duration}
+                                                </span>
+                                            )}
+                                        </div>
+                                        {block.type === 'study' && (
+                                            <p className="text-xs opacity-70 mt-1 pl-6">
+                                                Focus deeply. Put phone away.
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+            
+            <div className="p-6 bg-slate-50 border-t border-slate-100 text-center">
+                <p className="text-sm text-slate-500 mb-4">
+                    "Consistency is not about perfection. It is about refusing to give up."
+                </p>
+                <button 
+                  onClick={() => window.print()}
+                  className="text-blue-600 font-bold text-sm hover:underline"
+                >
+                    Print / Save as PDF
+                </button>
+            </div>
+        </div>
+      )}
     </div>
   );
 };
