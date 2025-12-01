@@ -8,7 +8,8 @@ import {
   Calendar, 
   LogOut, 
   Users,
-  FileText
+  FileText,
+  Settings
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -27,17 +28,20 @@ const Layout: React.FC<LayoutProps> = ({ user, activeTab, setActiveTab, onLogout
     { id: 'tests', label: 'Mock Exams', icon: PenTool },
     { id: 'analytics', label: 'Analytics', icon: PieChart },
     { id: 'timetable', label: 'Timetable', icon: Calendar },
+    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   const parentNav = [
     { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
     { id: 'analytics', label: 'Performance', icon: PieChart },
+    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   const adminNav = [
     { id: 'dashboard', label: 'Admin Panel', icon: LayoutDashboard },
     { id: 'users', label: 'Manage Users', icon: Users },
     { id: 'docs', label: 'System Docs', icon: FileText },
+    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   const navItems = user.role === 'student' ? studentNav : user.role === 'parent' ? parentNav : adminNav;

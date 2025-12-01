@@ -101,7 +101,7 @@ CREATE TABLE student_test_attempts (
 );
 
 -- ==========================================
--- 4. UTILITIES
+-- 4. UTILITIES & CONFIG
 -- ==========================================
 
 CREATE TABLE planner (
@@ -112,6 +112,14 @@ CREATE TABLE planner (
     task_type VARCHAR(30),
     duration INT,
     status ENUM('pending','done'),
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE timetable_config (
+    student_id INT PRIMARY KEY,
+    student_type ENUM('regular', 'dummy') DEFAULT 'regular',
+    config_data JSON, -- Stores school/coaching/sleep times and days
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
 );
 

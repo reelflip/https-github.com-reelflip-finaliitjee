@@ -9,6 +9,7 @@ import TestCenter from './components/TestCenter';
 import TimetableGenerator from './components/TimetableGenerator';
 import AdminDocs from './components/AdminDocs';
 import AdminUserManagement from './components/AdminUserManagement';
+import Settings from './components/Settings';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -34,6 +35,8 @@ const App: React.FC = () => {
         return <AdminUserManagement />;
       case 'docs':
         return <AdminDocs />;
+      case 'settings':
+        return <Settings user={user} />;
       default:
         return <div className="p-4">Module under construction</div>;
     }
