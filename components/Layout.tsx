@@ -27,7 +27,7 @@ const Layout: React.FC<LayoutProps> = ({ user, activeTab, setActiveTab, onLogout
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'syllabus', label: 'Syllabus Tracker', icon: BookOpen },
     { id: 'focus', label: 'Focus Zone', icon: BrainCircuit },
-    { id: 'tests', label: 'Mock Exams', icon: PenTool },
+    { id: 'tests', label: 'Test Center', icon: PenTool },
     { id: 'analytics', label: 'Analytics', icon: PieChart },
     { id: 'timetable', label: 'Timetable', icon: Calendar },
     { id: 'settings', label: 'Settings', icon: Settings },
@@ -43,7 +43,7 @@ const Layout: React.FC<LayoutProps> = ({ user, activeTab, setActiveTab, onLogout
   const adminNav = [
     { id: 'dashboard', label: 'Admin Panel', icon: LayoutDashboard },
     { id: 'users', label: 'Manage Users', icon: Users },
-    { id: 'tests', label: 'Mock Exams', icon: PenTool },
+    { id: 'tests', label: 'Test Center', icon: PenTool },
     { id: 'docs', label: 'System Docs', icon: FileText },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];

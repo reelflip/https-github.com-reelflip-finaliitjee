@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Test, Question, User } from '../types';
-import { PlayCircle, Clock, CheckCircle, Plus, Save, Trash2, X, FileText, List, ChevronRight, Database, Search, Filter } from 'lucide-react';
+import { PlayCircle, Clock, CheckCircle, Plus, Save, Trash2, X, FileText, List, ChevronRight, Database, Search, Filter, ShieldCheck } from 'lucide-react';
 
 interface TestCenterProps {
     user: User;
@@ -383,6 +383,13 @@ const TestCenter: React.FC<TestCenterProps> = ({ user }) => {
   // --- LIST VIEW ---
   return (
     <div className="space-y-6">
+      {user.role === 'admin' && (
+          <div className="bg-slate-900 text-slate-200 px-4 py-2 rounded-lg flex items-center gap-2 text-sm mb-4">
+              <ShieldCheck size={16} className="text-green-400" />
+              <span>Admin Mode Active: You can create tests and manage the question bank.</span>
+          </div>
+      )}
+
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-slate-800">Test Center</h2>
