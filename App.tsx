@@ -24,11 +24,11 @@ const App: React.FC = () => {
       case 'dashboard':
         return <Dashboard user={user} />;
       case 'syllabus':
-        return <Syllabus />;
+        return <Syllabus readOnly={user.role === 'parent'} />;
       case 'analytics':
         return <Analytics />;
       case 'tests':
-        return <TestCenter />;
+        return <TestCenter user={user} />;
       case 'timetable':
         return <TimetableGenerator />; 
       case 'users':

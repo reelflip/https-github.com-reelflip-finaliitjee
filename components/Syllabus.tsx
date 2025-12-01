@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Subject, Topic, TopicStatus } from '../types';
-import { ChevronDown, ChevronRight, CheckCircle2, Circle, Clock, PenTool } from 'lucide-react';
+import { ChevronDown, ChevronRight, CheckCircle2, Circle, Clock, PenTool, Eye } from 'lucide-react';
+
+interface SyllabusProps {
+  readOnly?: boolean;
+}
 
 const INITIAL_SYLLABUS: Subject[] = [
   {
@@ -99,10 +103,43 @@ const StatusBadge: React.FC<{ status: TopicStatus }> = ({ status }) => {
   );
 };
 
-const Syllabus: React.FC = () => {
+const Syllabus: React.FC<SyllabusProps> = ({ readOnly = false }) => {
   const [syllabus, setSyllabus] = useState<Subject[]>(INITIAL_SYLLABUS);
   const [activeSubject, setActiveSubject] = useState<number>(1);
   const [expandedChapters, setExpandedChapters] = useState<number[]>([301, 101, 201]);
+
+  // Simulate data fetching for Parents (Read-Only Mode)
+  useEffect(() => {
+    if (readOnly) {
+      // Simulate randomization to show student progress
+      const simulatedSyllabus = INITIAL_SYLLABUS.map(subject => ({
+        ...subject,
+        chapters: subject.chapters.map(chapter => ({
+          ...chapter,
+          topics: chapter.topics.map(topic => {
+             // Random status
+             const statuses: TopicStatus[] = ['not_started', 'in_progress', 'completed', 'revision_required'];
+             const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+             
+             // Random exercises
+             const ex1 = Math.floor(Math.random() * 20);
+             const ex2 = Math.floor(Math.random() * 10);
+             
+             return {
+                ...topic,
+                status: randomStatus,
+                exercises: {
+                    ...topic.exercises,
+                    ex1: ex1,
+                    ex2: ex2
+                }
+             };
+          })
+        }))
+      }));
+      setSyllabus(simulatedSyllabus);
+    }
+  }, [readOnly]);
 
   const toggleChapter = (id: number) => {
     setExpandedChapters(prev => 
@@ -111,6 +148,7 @@ const Syllabus: React.FC = () => {
   };
 
   const updateStatus = (chapterId: number, topicId: number, newStatus: TopicStatus) => {
+    if (readOnly) return;
     const updated = syllabus.map(subject => ({
       ...subject,
       chapters: subject.chapters.map(chapter => {
@@ -128,6 +166,7 @@ const Syllabus: React.FC = () => {
   };
 
   const updateExercise = (chapterId: number, topicId: number, exercise: keyof Topic['exercises'], value: string) => {
+    if (readOnly) return;
     const intVal = Math.max(0, parseInt(value) || 0);
     const updated = syllabus.map(subject => ({
       ...subject,
@@ -160,6 +199,12 @@ const Syllabus: React.FC = () => {
            <h2 className="text-2xl font-bold text-slate-800">JEE Main 2025 Syllabus Tracker</h2>
            <p className="text-slate-500">Official syllabus with 14 Maths, 20 Physics, and 20 Chemistry Units.</p>
         </div>
+        {readOnly && (
+            <div className="bg-purple-100 border border-purple-200 text-purple-800 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+                <Eye size={16} />
+                Viewing Student Progress (Read-Only)
+            </div>
+        )}
       </div>
 
       {/* Subject Tabs */}
@@ -225,7 +270,7 @@ const Syllabus: React.FC = () => {
 
                     <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                         {/* Exercise Inputs */}
-                        <div className="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-100 overflow-x-auto max-w-full">
+                        <div className={`flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-100 overflow-x-auto max-w-full ${readOnly ? 'opacity-80' : ''}`}>
                              <div className="flex items-center gap-1 text-slate-400 mr-2 border-r border-slate-200 pr-2 shrink-0">
                                 <PenTool size={12} />
                                 <div className="flex flex-col">
@@ -242,7 +287,8 @@ const Syllabus: React.FC = () => {
                                             type="number"
                                             min="0"
                                             placeholder="0"
-                                            className="w-10 h-6 text-center text-xs border border-slate-200 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-200 outline-none transition-all bg-white"
+                                            disabled={readOnly}
+                                            className="w-10 h-6 text-center text-xs border border-slate-200 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-200 outline-none transition-all bg-white disabled:bg-slate-50 disabled:text-slate-500"
                                             value={topic.exercises[ex] || ''}
                                             onChange={(e) => updateExercise(chapter.id, topic.id, ex, e.target.value)}
                                             onClick={(e) => (e.target as HTMLInputElement).select()}
@@ -252,7 +298,8 @@ const Syllabus: React.FC = () => {
                                             type="number"
                                             min="0"
                                             placeholder="0"
-                                            className="w-10 h-6 text-center text-[10px] border border-slate-200 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-200 outline-none transition-all bg-slate-100 text-slate-500"
+                                            disabled={readOnly}
+                                            className="w-10 h-6 text-center text-[10px] border border-slate-200 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-200 outline-none transition-all bg-slate-100 text-slate-500 disabled:opacity-70"
                                             value={topic.exercises[totalKey] || ''}
                                             onChange={(e) => updateExercise(chapter.id, topic.id, totalKey, e.target.value)}
                                             onClick={(e) => (e.target as HTMLInputElement).select()}
@@ -267,8 +314,9 @@ const Syllabus: React.FC = () => {
                         <div className="flex items-center gap-3 shrink-0">
                         <select 
                             value={topic.status}
+                            disabled={readOnly}
                             onChange={(e) => updateStatus(chapter.id, topic.id, e.target.value as TopicStatus)}
-                            className="text-sm border border-slate-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="text-sm border border-slate-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-slate-100 disabled:text-slate-500"
                         >
                             <option value="not_started">Not Started</option>
                             <option value="in_progress">In Progress</option>

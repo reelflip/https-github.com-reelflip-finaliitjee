@@ -93,7 +93,7 @@ CREATE TABLE parent_student_requests (
 CREATE TABLE syllabus_topics (
     id INT PRIMARY KEY,
     subject VARCHAR(50),
-    chapter_name VARCHAR(100), -- Maps to JEE "UNIT" name
+    chapter_name VARCHAR(100),
     phase VARCHAR(20),
     topic_name VARCHAR(100),
     est_hours INT
@@ -153,8 +153,8 @@ CREATE TABLE questions (
     topic_id INT,
     difficulty ENUM('easy','medium','hard'),
     question_text TEXT,
-    options_json TEXT, -- JSON array of options
-    correct_option INT, -- Index 0-3
+    options_json TEXT, 
+    correct_option INT, 
     FOREIGN KEY (topic_id) REFERENCES syllabus_topics(id) ON DELETE SET NULL
 );
 
@@ -187,7 +187,7 @@ CREATE TABLE planner (
 CREATE TABLE timetable_config (
     student_id INT PRIMARY KEY,
     student_type ENUM('regular', 'dummy') DEFAULT 'regular',
-    config_data JSON, -- Stores school/coaching/sleep times and days
+    config_data JSON, 
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
 );

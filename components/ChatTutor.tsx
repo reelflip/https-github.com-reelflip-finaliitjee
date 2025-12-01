@@ -10,7 +10,7 @@ interface Message {
 
 const ChatTutor: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([
-        { id: 1, text: "Hi! I'm your AI JEE Tutor. Stuck on a concept? Ask me anything about Physics, Chemistry, or Maths!", sender: 'ai' }
+        { id: 1, text: "Hi! I'm your JEE Assistant. I can help with general study tips, subject strategies, and motivation. Ask away!", sender: 'ai' }
     ]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
@@ -35,7 +35,7 @@ const ChatTutor: React.FC = () => {
         <div className="flex flex-col h-[calc(100vh-8rem)] bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="bg-indigo-600 p-4 text-white flex items-center gap-2">
                 <Bot size={20} />
-                <h2 className="font-semibold">Gemini AI Tutor</h2>
+                <h2 className="font-semibold">JEE Helper Bot</h2>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -71,7 +71,7 @@ const ChatTutor: React.FC = () => {
                     type="text" 
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Ask a doubt (e.g., 'Explain Angular Momentum')" 
+                    placeholder="Ask about Physics, Time Management, etc..." 
                     className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                 />
                 <button 

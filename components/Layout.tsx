@@ -33,6 +33,7 @@ const Layout: React.FC<LayoutProps> = ({ user, activeTab, setActiveTab, onLogout
 
   const parentNav = [
     { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
+    { id: 'syllabus', label: 'Syllabus Progress', icon: BookOpen },
     { id: 'analytics', label: 'Performance', icon: PieChart },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];

@@ -66,15 +66,15 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
             <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-40 h-40 bg-indigo-500 rounded-full opacity-20 blur-3xl"></div>
         </div>
 
-        {/* AI Study Tip */}
+        {/* Static Study Tip */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col">
             <div className="flex items-center gap-2 mb-3 text-emerald-600">
                 <Target size={20} />
-                <h3 className="font-semibold">AI Insight of the Day</h3>
+                <h3 className="font-semibold">Tip of the Day</h3>
             </div>
             <p className="text-slate-600 text-sm italic flex-1">"{tip}"</p>
             <div className="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-400 text-right">
-                Powered by Gemini 2.5
+                Daily Wisdom
             </div>
         </div>
       </div>
