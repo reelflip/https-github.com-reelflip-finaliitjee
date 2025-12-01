@@ -101,7 +101,33 @@ CREATE TABLE student_test_attempts (
 );
 
 -- ==========================================
--- 4. UTILITIES & CONFIG
+-- 4. QUESTION BANK & PRACTICE
+-- ==========================================
+
+CREATE TABLE questions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    subject VARCHAR(50),
+    topic_id INT,
+    difficulty ENUM('easy','medium','hard'),
+    question_text TEXT,
+    options_json TEXT, -- JSON array of options
+    correct_option INT, -- Index 0-3
+    FOREIGN KEY (topic_id) REFERENCES syllabus_topics(id) ON DELETE SET NULL
+);
+
+CREATE TABLE practice_sessions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT,
+    topic_id INT,
+    correct_count INT,
+    wrong_count INT,
+    attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (topic_id) REFERENCES syllabus_topics(id) ON DELETE CASCADE
+);
+
+-- ==========================================
+-- 5. UTILITIES & CONFIG
 -- ==========================================
 
 CREATE TABLE planner (
@@ -132,7 +158,7 @@ CREATE TABLE notifications (
 );
 
 -- ==========================================
--- 5. INITIAL DATA SEEDING (JEE MAIN 2025)
+-- 6. INITIAL DATA SEEDING (JEE MAIN 2025)
 -- ==========================================
 
 -- MATHEMATICS (Units 1-14)
