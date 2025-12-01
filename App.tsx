@@ -10,6 +10,7 @@ import TimetableGenerator from './components/TimetableGenerator';
 import AdminDocs from './components/AdminDocs';
 import AdminUserManagement from './components/AdminUserManagement';
 import Settings from './components/Settings';
+import FocusZone from './components/FocusZone';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -31,6 +32,8 @@ const App: React.FC = () => {
         return <TestCenter user={user} />;
       case 'timetable':
         return <TimetableGenerator />; 
+      case 'focus':
+        return <FocusZone user={user} />;
       case 'users':
         return <AdminUserManagement />;
       case 'docs':

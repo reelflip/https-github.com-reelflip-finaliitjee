@@ -9,7 +9,8 @@ import {
   LogOut, 
   Users,
   FileText,
-  Settings
+  Settings,
+  BrainCircuit
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -25,6 +26,7 @@ const Layout: React.FC<LayoutProps> = ({ user, activeTab, setActiveTab, onLogout
   const studentNav = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'syllabus', label: 'Syllabus Tracker', icon: BookOpen },
+    { id: 'focus', label: 'Focus Zone', icon: BrainCircuit },
     { id: 'tests', label: 'Mock Exams', icon: PenTool },
     { id: 'analytics', label: 'Analytics', icon: PieChart },
     { id: 'timetable', label: 'Timetable', icon: Calendar },

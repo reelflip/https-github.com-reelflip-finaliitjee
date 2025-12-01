@@ -192,6 +192,17 @@ CREATE TABLE timetable_config (
     FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE study_sessions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT,
+    subject VARCHAR(50),
+    duration_minutes INT,
+    session_type ENUM('pomodoro', 'deep_work'),
+    recall_notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 CREATE TABLE notifications (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(100),
