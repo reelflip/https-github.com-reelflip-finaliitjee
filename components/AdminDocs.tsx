@@ -1,5 +1,5 @@
 import React from 'react';
-import { Database, Copy, Download, Code, Globe, FileCog, FolderOpen, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Database, Copy, Download, Code, Globe, FileCog, FolderOpen, ArrowRight, CheckCircle2, FileJson } from 'lucide-react';
 
 const FULL_SCHEMA = `
 -- ==========================================
@@ -104,12 +104,11 @@ CREATE TABLE student_test_attempts (
 CREATE TABLE questions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     subject VARCHAR(50),
-    topic_id INT,
-    difficulty ENUM('easy','medium','hard'),
+    topic_name VARCHAR(100),
+    difficulty ENUM('easy','medium','hard') DEFAULT 'medium',
     question_text TEXT,
     options_json TEXT, 
-    correct_option INT, 
-    FOREIGN KEY (topic_id) REFERENCES syllabus_topics(id) ON DELETE SET NULL
+    correct_option INT
 );
 
 CREATE TABLE practice_sessions (
@@ -369,6 +368,39 @@ const HTACCESS_CODE = `
 </IfModule>
 `.trim();
 
+const PHP_QUESTIONS = `
+<?php
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type");
+
+$file = 'questions.json';
+
+// Handle GET request (Read questions)
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    if (file_exists($file)) {
+        echo file_get_contents($file);
+    } else {
+        echo json_encode([]);
+    }
+    exit;
+}
+
+// Handle POST request (Add/Update questions)
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data = file_get_contents('php://input');
+    // Validate JSON
+    if (json_decode($data)) {
+        file_put_contents($file, $data);
+        echo json_encode(['success' => true, 'message' => 'Questions saved']);
+    } else {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Invalid JSON']);
+    }
+    exit;
+}
+?>
+`.trim();
+
 const AdminDocs: React.FC = () => {
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
@@ -391,7 +423,7 @@ const AdminDocs: React.FC = () => {
         <div className="space-y-8 pb-12 max-w-5xl mx-auto">
             <div>
                 <h2 className="text-3xl font-bold text-slate-900">Deployment Guide</h2>
-                <p className="text-slate-500 mt-2">Follow these <strong className="text-slate-800">4 Phases</strong> sequentially to deploy your site to Hostinger.</p>
+                <p className="text-slate-500 mt-2">Follow these <strong className="text-slate-800">5 Phases</strong> sequentially to deploy your site to Hostinger.</p>
             </div>
 
             {/* PHASE 1: DATABASE */}
@@ -436,7 +468,7 @@ const AdminDocs: React.FC = () => {
                 
                 <div className="p-6">
                     <p className="text-sm text-slate-600 mb-6">
-                        Download these 4 essential files to your computer. You will upload them later.
+                        Download these essential files to your computer. You will upload them later.
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -579,6 +611,11 @@ const AdminDocs: React.FC = () => {
                                 <Code size={14}/> register_student.php <span className="text-xs text-slate-400">(From Phase 2)</span>
                             </div>
 
+                            {/* Added Question Bank File */}
+                            <div className="ml-12 flex items-center gap-2 text-slate-500 border-l-2 border-slate-200 pl-2">
+                                <Code size={14}/> questions.php <span className="text-xs text-purple-600 font-bold">(See Phase 5)</span>
+                            </div>
+
                             <div className="ml-6 flex items-center gap-2 text-slate-600">
                                 <FileCog size={16} className="text-slate-400"/> .htaccess <span className="text-xs text-slate-400">(From Phase 2)</span>
                             </div>
@@ -595,6 +632,33 @@ const AdminDocs: React.FC = () => {
                         <p className="text-sm text-green-700 mt-2">
                             Once your file structure matches the diagram, your IIT JEE Tracker will be live at your domain name.
                         </p>
+                    </div>
+                </div>
+            </section>
+
+             {/* PHASE 5: QUESTION BANK API */}
+             <section className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="bg-slate-900 text-white p-4 flex items-center gap-3">
+                    <div className="bg-slate-700 px-3 py-1 rounded text-sm font-bold">Phase 5</div>
+                    <div className="flex items-center gap-2">
+                        <FileJson size={20} className="text-pink-400" />
+                        <h3 className="font-semibold">Question Bank Setup (Optional)</h3>
+                    </div>
+                </div>
+                
+                <div className="p-6">
+                    <p className="text-sm text-slate-600 mb-6">
+                        To enable the Admin Question Bank (Server-side File Storage), upload this file to your <code>/backend</code> folder.
+                    </p>
+
+                    <div className="border border-slate-200 rounded-lg p-4 hover:border-blue-300 transition-colors bg-pink-50/30">
+                        <div className="flex justify-between items-center mb-2">
+                            <h4 className="font-bold text-slate-800 flex items-center gap-2"><Code size={16}/> questions.php</h4>
+                            <button onClick={() => downloadFile('questions.php', PHP_QUESTIONS)} className="text-xs bg-pink-600 text-white px-3 py-1.5 rounded hover:bg-pink-700 transition-colors flex items-center gap-1 shadow-sm">
+                                <Download size={12} /> Download
+                            </button>
+                        </div>
+                        <p className="text-xs text-slate-500">Reads/Writes to <code>questions.json</code> on the server.</p>
                     </div>
                 </div>
             </section>

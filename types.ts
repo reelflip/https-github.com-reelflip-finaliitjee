@@ -57,6 +57,8 @@ export interface Question {
   text: string;
   options: string[];
   correctOption: number;
+  subject?: string;
+  topic?: string;
 }
 
 export interface Notification {

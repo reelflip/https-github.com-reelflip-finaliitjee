@@ -150,12 +150,11 @@ CREATE TABLE student_test_attempts (
 CREATE TABLE questions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     subject VARCHAR(50),
-    topic_id INT,
-    difficulty ENUM('easy','medium','hard'),
+    topic_name VARCHAR(100),
+    difficulty ENUM('easy','medium','hard') DEFAULT 'medium',
     question_text TEXT,
     options_json TEXT, 
-    correct_option INT, 
-    FOREIGN KEY (topic_id) REFERENCES syllabus_topics(id) ON DELETE SET NULL
+    correct_option INT
 );
 
 CREATE TABLE practice_sessions (
