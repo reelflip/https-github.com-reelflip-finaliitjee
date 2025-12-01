@@ -1,5 +1,5 @@
 import React from 'react';
-import { Database, Server, Copy, CheckCircle, Terminal, FileCode, Globe, Shield } from 'lucide-react';
+import { Database, Server, Copy, Download, Code, Globe, Shield, FileCog } from 'lucide-react';
 
 const FULL_SCHEMA = `
 -- ==========================================
@@ -211,7 +211,119 @@ INSERT INTO syllabus_topics (id, subject, chapter_name, phase, topic_name, est_h
 (2201, 'Chemistry', 'UNIT 20: Principles Related to Practical Chemistry', 'Practical Chem', 'Practical Chemistry', 5);
 `.trim();
 
-const HtaccessCode = `
+const PHP_CONFIG = `
+<?php
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+
+$host = '82.25.121.80';
+$db   = 'u131922718_iitjee_tracker';
+$user = 'u131922718_iitjee_tracker';
+$pass = 'YOUR_DB_PASSWORD_HERE'; // <--- IMPORTANT: Update this!
+$charset = 'utf8mb4';
+
+$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+];
+
+try {
+    $pdo = new PDO($dsn, $user, $pass, $options);
+} catch (\\PDOException $e) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Database connection failed']);
+    exit;
+}
+?>
+`.trim();
+
+const PHP_LOGIN = `
+<?php
+require_once '../config.php';
+
+$data = json_decode(file_get_contents('php://input'), true);
+
+if (!$data) {
+    echo json_encode(['success' => false, 'message' => 'Invalid input']);
+    exit;
+}
+
+$email = $data['email'];
+$password = $data['password'];
+$role = $data['role'];
+
+// For security, use password_verify() in production. 
+// This is a simplified example.
+$stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? AND role = ?");
+$stmt->execute([$email, $role]);
+$user = $stmt->fetch();
+
+if ($user && $password === '123456') { // Demo Password Check
+    // In production: if ($user && password_verify($password, $user['password_hash'])) {
+    
+    // Fetch extra details
+    $details = [];
+    if ($role === 'student') {
+        $stmtS = $pdo->prepare("SELECT * FROM students WHERE user_id = ?");
+        $stmtS->execute([$user['id']]);
+        $details = $stmtS->fetch();
+    } elseif ($role === 'parent') {
+        $stmtP = $pdo->prepare("SELECT * FROM parents WHERE user_id = ?");
+        $stmtP->execute([$user['id']]);
+        $details = $stmtP->fetch();
+    }
+
+    echo json_encode([
+        'success' => true,
+        'user' => array_merge($user, $details ? $details : [])
+    ]);
+} else {
+    echo json_encode(['success' => false, 'message' => 'Invalid credentials']);
+}
+?>
+`.trim();
+
+const PHP_REGISTER = `
+<?php
+require_once '../config.php';
+
+$data = json_decode(file_get_contents('php://input'), true);
+
+$fullName = $data['fullName'];
+$email = $data['email'];
+$password = password_hash($data['password'], PASSWORD_DEFAULT);
+$role = 'student';
+$institute = $data['institute'];
+$targetYear = $data['targetYear'];
+$recoveryQ = $data['recoveryQuestion'];
+$recoveryA = $data['recoveryAnswer'];
+
+try {
+    $pdo->beginTransaction();
+
+    // Insert User
+    $stmt = $pdo->prepare("INSERT INTO users (full_name, email, password_hash, role, recovery_question, recovery_answer) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->execute([$fullName, $email, $password, $role, $recoveryQ, $recoveryA]);
+    $userId = $pdo->lastInsertId();
+
+    // Insert Student Details
+    $stmt2 = $pdo->prepare("INSERT INTO students (user_id, institute, target_year) VALUES (?, ?, ?)");
+    $stmt2->execute([$userId, $institute, $targetYear]);
+
+    $pdo->commit();
+    echo json_encode(['success' => true]);
+
+} catch (Exception $e) {
+    $pdo->rollBack();
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+}
+?>
+`.trim();
+
+const HTACCESS_CODE = `
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
@@ -221,7 +333,7 @@ const HtaccessCode = `
   RewriteCond %{REQUEST_FILENAME} !-l
   RewriteRule . /index.html [L]
 </IfModule>
-`;
+`.trim();
 
 const AdminDocs: React.FC = () => {
     const copyToClipboard = (text: string) => {
@@ -229,19 +341,31 @@ const AdminDocs: React.FC = () => {
         alert('Copied to clipboard!');
     };
 
+    const downloadFile = (filename: string, content: string) => {
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
     return (
         <div className="space-y-8 pb-10">
             <div>
-                <h2 className="text-3xl font-bold text-slate-900">System Documentation</h2>
-                <p className="text-slate-500 mt-2">Reference guide for database management and deployment.</p>
+                <h2 className="text-3xl font-bold text-slate-900">System Deployment & Docs</h2>
+                <p className="text-slate-500 mt-2">Everything you need to deploy to Hostinger, even without Node.js.</p>
             </div>
 
-            {/* Database Schema Section */}
+            {/* SECTION 1: DATABASE */}
             <section className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div className="bg-slate-900 text-white p-4 flex justify-between items-center">
                     <div className="flex items-center gap-2">
                         <Database size={20} className="text-blue-400" />
-                        <h3 className="font-semibold">Complete MySQL Database Schema</h3>
+                        <h3 className="font-semibold">1. MySQL Database Setup</h3>
                     </div>
                     <button 
                         onClick={() => copyToClipboard(FULL_SCHEMA)}
@@ -251,105 +375,139 @@ const AdminDocs: React.FC = () => {
                     </button>
                 </div>
                 <div className="p-0">
-                    <pre className="bg-slate-50 p-6 text-xs font-mono text-slate-700 overflow-x-auto border-b border-slate-100 leading-relaxed max-h-[500px] overflow-y-auto">
+                    <div className="bg-blue-50 p-4 text-xs text-blue-800 border-b border-blue-100">
+                        <strong>Action:</strong> Go to Hostinger → Databases → phpMyAdmin. Select your database and run this SQL in the "SQL" tab.
+                    </div>
+                    <pre className="bg-slate-50 p-6 text-xs font-mono text-slate-700 overflow-x-auto leading-relaxed max-h-[300px] overflow-y-auto">
                         {FULL_SCHEMA}
                     </pre>
                 </div>
             </section>
 
-            {/* Deployment Guide Section */}
+            {/* SECTION 2: BACKEND FILES */}
             <section className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="bg-blue-600 text-white p-4 flex items-center gap-2">
-                    <Server size={20} />
-                    <h3 className="font-semibold">Hostinger Deployment Guide</h3>
+                <div className="bg-indigo-600 text-white p-4 flex items-center gap-2">
+                    <FileCog size={20} />
+                    <h3 className="font-semibold">2. Backend Files (Download & Upload)</h3>
                 </div>
                 
-                <div className="p-8 space-y-8">
-                    
-                    {/* Step 1 */}
-                    <div className="flex gap-4">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold shrink-0">1</div>
-                        <div className="space-y-2 flex-1">
-                            <h4 className="font-bold text-slate-800">Build the Frontend</h4>
-                            <p className="text-sm text-slate-600">
-                                Run the build command in your local environment (or StackBlitz) to generate the static files.
-                            </p>
-                            <div className="bg-slate-900 text-slate-200 p-3 rounded-lg font-mono text-sm inline-block">
-                                npm run build
-                            </div>
-                            <p className="text-xs text-slate-500 italic">This creates a `dist` folder containing index.html and assets.</p>
-                        </div>
-                    </div>
+                <div className="p-6">
+                    <p className="text-sm text-slate-600 mb-6">
+                        Since you might not be able to create these manually, download them here and upload to <span className="font-mono bg-slate-100 px-1 rounded">public_html/backend/</span> folder.
+                    </p>
 
-                    {/* Step 2 */}
-                    <div className="flex gap-4">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold shrink-0">2</div>
-                        <div className="space-y-2 flex-1">
-                            <h4 className="font-bold text-slate-800">Prepare PHP Backend</h4>
-                            <p className="text-sm text-slate-600">
-                                Ensure your `backend/config.php` has the correct Hostinger database credentials.
-                            </p>
-                            <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg text-sm text-yellow-800 font-mono">
-                                $host = '82.25.121.80';<br/>
-                                $db   = 'u131922718_iitjee_tracker';<br/>
-                                $user = 'u131922718_iitjee_tracker';<br/>
-                                $pass = 'YOUR_PASSWORD_HERE';
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Step 3 */}
-                    <div className="flex gap-4">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold shrink-0">3</div>
-                        <div className="space-y-2 flex-1">
-                            <h4 className="font-bold text-slate-800">Upload to File Manager</h4>
-                            <p className="text-sm text-slate-600">
-                                Upload the contents of `dist` and the `backend` folder to <span className="font-mono bg-slate-100 px-1">public_html</span>.
-                            </p>
-                            <div className="border border-slate-200 rounded-lg p-4 bg-slate-50 text-sm font-mono text-slate-700">
-                                /public_html/<br/>
-                                ├── assets/ <span className="text-slate-400"> (from dist)</span><br/>
-                                ├── backend/ <span className="text-slate-400"> (your php files)</span><br/>
-                                ├── index.html <span className="text-slate-400"> (from dist)</span><br/>
-                                └── .htaccess
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Step 4 */}
-                    <div className="flex gap-4">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold shrink-0">4</div>
-                        <div className="space-y-2 flex-1">
-                            <h4 className="font-bold text-slate-800">Configure Routing (.htaccess)</h4>
-                            <p className="text-sm text-slate-600">
-                                Create a `.htaccess` file in `public_html` to handle React routing. This prevents 404 errors when refreshing pages.
-                            </p>
-                            <div className="relative">
-                                <pre className="bg-slate-900 text-slate-200 p-4 rounded-lg font-mono text-xs overflow-x-auto">
-                                    {HtaccessCode.trim()}
-                                </pre>
-                                <button 
-                                    onClick={() => copyToClipboard(HtaccessCode.trim())}
-                                    className="absolute top-2 right-2 p-1.5 text-slate-400 hover:text-white bg-white/10 rounded transition-colors"
-                                    title="Copy"
-                                >
-                                    <Copy size={14} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Config */}
+                        <div className="border border-slate-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
+                            <div className="flex justify-between items-center mb-2">
+                                <h4 className="font-bold text-slate-800 flex items-center gap-2"><Code size={16}/> config.php</h4>
+                                <button onClick={() => downloadFile('config.php', PHP_CONFIG)} className="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded border border-indigo-100 flex items-center gap-1 hover:bg-indigo-100">
+                                    <Download size={12} /> Download
                                 </button>
                             </div>
+                            <p className="text-xs text-slate-500">Database connection settings. <span className="text-red-500 font-bold">Edit password after downloading!</span></p>
+                        </div>
+
+                        {/* Login */}
+                        <div className="border border-slate-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
+                            <div className="flex justify-between items-center mb-2">
+                                <h4 className="font-bold text-slate-800 flex items-center gap-2"><Code size={16}/> auth/login.php</h4>
+                                <button onClick={() => downloadFile('login.php', PHP_LOGIN)} className="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded border border-indigo-100 flex items-center gap-1 hover:bg-indigo-100">
+                                    <Download size={12} /> Download
+                                </button>
+                            </div>
+                            <p className="text-xs text-slate-500">Handles user authentication. Upload to <code>backend/auth/</code> folder.</p>
+                        </div>
+
+                        {/* Register */}
+                        <div className="border border-slate-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
+                            <div className="flex justify-between items-center mb-2">
+                                <h4 className="font-bold text-slate-800 flex items-center gap-2"><Code size={16}/> auth/register_student.php</h4>
+                                <button onClick={() => downloadFile('register_student.php', PHP_REGISTER)} className="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded border border-indigo-100 flex items-center gap-1 hover:bg-indigo-100">
+                                    <Download size={12} /> Download
+                                </button>
+                            </div>
+                            <p className="text-xs text-slate-500">Handles student signup. Upload to <code>backend/auth/</code> folder.</p>
+                        </div>
+
+                         {/* Htaccess */}
+                         <div className="border border-slate-200 rounded-lg p-4 hover:border-blue-300 transition-colors bg-slate-50">
+                            <div className="flex justify-between items-center mb-2">
+                                <h4 className="font-bold text-slate-800 flex items-center gap-2"><FileCog size={16}/> .htaccess</h4>
+                                <button onClick={() => downloadFile('.htaccess', HTACCESS_CODE)} className="text-xs bg-slate-200 text-slate-700 px-2 py-1 rounded border border-slate-300 flex items-center gap-1 hover:bg-slate-300">
+                                    <Download size={12} /> Download
+                                </button>
+                            </div>
+                            <p className="text-xs text-slate-500">Required for React Routing. Upload to <code>public_html/</code> root.</p>
                         </div>
                     </div>
+                </div>
+            </section>
 
-                    {/* Step 5 */}
-                    <div className="flex gap-4">
-                         <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold shrink-0">5</div>
-                         <div className="space-y-2 flex-1">
-                            <h4 className="font-bold text-slate-800">Import Database</h4>
-                            <p className="text-sm text-slate-600">
-                                Go to <strong>Hostinger hPanel &rarr; Databases &rarr; phpMyAdmin</strong>. Select your database and use the "Import" or "SQL" tab to run the schema code provided above.
-                            </p>
-                         </div>
+            {/* SECTION 3: FRONTEND BUILD (STACKBLITZ) */}
+            <section className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="bg-gradient-to-r from-orange-500 to-red-600 text-white p-4 flex items-center gap-2">
+                    <Globe size={20} />
+                    <h3 className="font-semibold">3. "No-Code" Build Guide (Frontend)</h3>
+                </div>
+                
+                <div className="p-8">
+                    <div className="bg-orange-50 border-l-4 border-orange-500 p-4 mb-6">
+                        <p className="text-sm text-orange-800">
+                            <strong>Problem:</strong> You cannot run <code>npm run build</code> on your computer.<br/>
+                            <strong>Solution:</strong> Use StackBlitz (a free online IDE) to build the files for you.
+                        </p>
                     </div>
 
+                    <div className="space-y-6 relative">
+                        {/* Step 3.1 */}
+                        <div className="flex gap-4">
+                            <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold shrink-0">1</div>
+                            <div className="space-y-1">
+                                <h4 className="font-bold text-slate-800">Go to StackBlitz</h4>
+                                <p className="text-sm text-slate-600">
+                                    Open <a href="https://stackblitz.com" target="_blank" className="text-blue-600 underline">StackBlitz.com</a> and click "New Project". Select "Upload" if you have the files, or simply copy-paste your code into a new React (Vite) project.
+                                </p>
+                            </div>
+                        </div>
+
+                         {/* Step 3.2 */}
+                         <div className="flex gap-4">
+                            <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold shrink-0">2</div>
+                            <div className="space-y-1">
+                                <h4 className="font-bold text-slate-800">Run Build Command</h4>
+                                <p className="text-sm text-slate-600">
+                                    In the StackBlitz terminal (bottom of screen), type these commands:
+                                </p>
+                                <div className="bg-slate-900 text-white p-3 rounded font-mono text-xs mt-2">
+                                    npm install<br/>
+                                    npm run build
+                                </div>
+                            </div>
+                        </div>
+
+                         {/* Step 3.3 */}
+                         <div className="flex gap-4">
+                            <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold shrink-0">3</div>
+                            <div className="space-y-1">
+                                <h4 className="font-bold text-slate-800">Download the 'dist' Folder</h4>
+                                <p className="text-sm text-slate-600">
+                                    Once the command finishes, you will see a <code className="bg-slate-100 px-1 rounded">dist</code> folder appear in the sidebar. Right-click it and select <strong>Download</strong>.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Step 3.4 */}
+                        <div className="flex gap-4">
+                            <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center font-bold shrink-0">4</div>
+                            <div className="space-y-1">
+                                <h4 className="font-bold text-slate-800">Upload to Hostinger</h4>
+                                <p className="text-sm text-slate-600">
+                                    Take the files inside that downloaded <code>dist</code> folder (index.html, assets, etc.) and upload them to your Hostinger <code>public_html</code> folder alongside the backend files you downloaded above.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
         </div>
