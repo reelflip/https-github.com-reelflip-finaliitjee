@@ -75,6 +75,16 @@ CREATE TABLE student_topic_progress (
 -- 3. EXAMS & ANALYTICS
 -- ==========================================
 
+CREATE TABLE questions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    subject VARCHAR(50),
+    topic_name VARCHAR(100),
+    difficulty ENUM('easy','medium','hard') DEFAULT 'medium',
+    question_text TEXT,
+    options_json TEXT, 
+    correct_option INT
+);
+
 CREATE TABLE tests (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(100),
@@ -82,6 +92,7 @@ CREATE TABLE tests (
     duration INT,
     total_marks INT,
     questions_count INT,
+    question_ids_json JSON,
     published BOOLEAN DEFAULT 0
 );
 
@@ -96,20 +107,6 @@ CREATE TABLE student_test_attempts (
     attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE
-);
-
--- ==========================================
--- 4. QUESTION BANK & PRACTICE
--- ==========================================
-
-CREATE TABLE questions (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    subject VARCHAR(50),
-    topic_name VARCHAR(100),
-    difficulty ENUM('easy','medium','hard') DEFAULT 'medium',
-    question_text TEXT,
-    options_json TEXT, 
-    correct_option INT
 );
 
 CREATE TABLE practice_sessions (
