@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
 import { Clock, BookOpen, Building2, Moon, CalendarClock, Loader2, Coffee, Zap, School, Backpack, CheckCircle2, SlidersHorizontal, ListChecks } from 'lucide-react';
+import { api } from '../services/api';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
@@ -10,7 +12,11 @@ interface ScheduleBlock {
   duration?: string;
 }
 
-const TimetableGenerator: React.FC = () => {
+interface TimetableProps {
+    userId?: number;
+}
+
+const TimetableGenerator: React.FC<TimetableProps> = ({ userId }) => {
   // State for Coaching (Evening/Regular)
   const [coachingDays, setCoachingDays] = useState<string[]>(['Mon', 'Wed', 'Fri']);
   const [coachingStart, setCoachingStart] = useState('17:30');
@@ -110,6 +116,21 @@ const TimetableGenerator: React.FC = () => {
         setIsGenerating(false);
         setView('result'); // Automatically switch to result view
         window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Save to Database
+        if (userId) {
+            api.saveTimetableConfig(userId, studentType, {
+                coachingDays,
+                coachingStart,
+                coachingEnd,
+                schoolStart,
+                schoolEnd,
+                wakeTime,
+                bedTime,
+                hasMorningCoaching,
+                morningCoachingStart
+            });
+        }
     }, 800);
   };
 

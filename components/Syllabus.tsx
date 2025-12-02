@@ -1,9 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
 import { Subject, Topic, TopicStatus } from '../types';
 import { ChevronDown, ChevronRight, CheckCircle2, Circle, Clock, PenTool, Eye, Search, Filter, Save, Calendar, Quote, Megaphone, LayoutGrid } from 'lucide-react';
+import { api } from '../services/api';
 
 interface SyllabusProps {
   readOnly?: boolean;
+  userId?: number; // Added user ID prop
 }
 
 const INITIAL_SYLLABUS: Subject[] = [
@@ -104,7 +107,7 @@ const StatusBadge: React.FC<{ status: TopicStatus }> = ({ status }) => {
   );
 };
 
-const Syllabus: React.FC<SyllabusProps> = ({ readOnly = false }) => {
+const Syllabus: React.FC<SyllabusProps> = ({ readOnly = false, userId }) => {
   const [syllabus, setSyllabus] = useState<Subject[]>(INITIAL_SYLLABUS);
   const [activeSubject, setActiveSubject] = useState<number | 'all'>('all');
   const [expandedChapters, setExpandedChapters] = useState<number[]>([301, 101, 201]);
@@ -156,6 +159,8 @@ const Syllabus: React.FC<SyllabusProps> = ({ readOnly = false }) => {
 
   const updateStatus = (chapterId: number, topicId: number, newStatus: TopicStatus) => {
     if (readOnly) return;
+    
+    // Optimistic Update
     const updated = syllabus.map(subject => ({
       ...subject,
       chapters: subject.chapters.map(chapter => {
@@ -164,6 +169,12 @@ const Syllabus: React.FC<SyllabusProps> = ({ readOnly = false }) => {
           ...chapter,
           topics: chapter.topics.map(topic => {
             if (topic.id !== topicId) return topic;
+            
+            // Trigger API Save
+            if (userId) {
+                api.updateTopicProgress(userId, topic.id, newStatus, topic.exercises);
+            }
+            
             return { ...topic, status: newStatus };
           })
         };
@@ -175,6 +186,7 @@ const Syllabus: React.FC<SyllabusProps> = ({ readOnly = false }) => {
   const updateExercise = (chapterId: number, topicId: number, exercise: keyof Topic['exercises'], value: string) => {
     if (readOnly) return;
     const intVal = Math.max(0, parseInt(value) || 0);
+    
     const updated = syllabus.map(subject => ({
       ...subject,
       chapters: subject.chapters.map(chapter => {
@@ -183,12 +195,20 @@ const Syllabus: React.FC<SyllabusProps> = ({ readOnly = false }) => {
           ...chapter,
           topics: chapter.topics.map(topic => {
             if (topic.id !== topicId) return topic;
-            return {
-              ...topic,
-              exercises: {
+            
+            const newExercises = {
                 ...topic.exercises,
                 [exercise]: intVal
-              }
+            };
+
+            // Trigger API Save
+            if (userId) {
+                api.updateTopicProgress(userId, topic.id, topic.status, newExercises);
+            }
+
+            return {
+              ...topic,
+              exercises: newExercises
             };
           })
         };

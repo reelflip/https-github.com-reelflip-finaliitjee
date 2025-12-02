@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { Test, Question, User, TestAttempt } from '../types';
 import { PlayCircle, Clock, CheckCircle, Plus, Save, Trash2, X, FileText, List, ChevronRight, Database, Search, Filter, ShieldCheck, History } from 'lucide-react';
+import { api } from '../services/api';
 
 interface TestCenterProps {
     user: User;
@@ -21,8 +23,6 @@ const TestCenter: React.FC<TestCenterProps> = ({
     testAttempts,
     onTestComplete 
 }) => {
-  // ... (State logic remains same, focus on render layout changes)
-  
   // Navigation State
   const [view, setView] = useState<'list' | 'take' | 'create' | 'bank' | 'history'>('list');
   
@@ -124,6 +124,7 @@ const TestCenter: React.FC<TestCenterProps> = ({
         date: new Date().toISOString().split('T')[0]
     };
     onTestComplete(attempt);
+    api.saveTestAttempt(attempt); // Call API
     setScoreResult({ score: score, accuracy: accuracy });
     setIsFinished(true);
   };
@@ -142,6 +143,8 @@ const TestCenter: React.FC<TestCenterProps> = ({
           topic: newBankQuestion.topic
       };
       setQuestionBank([...questionBank, q]);
+      // Note: Admin Question Bank saving is handled by PHP_QUESTIONS file logic in AdminDocs, 
+      // but ideally this would call an API too.
       setNewBankQuestion({ text: '', options: ['', '', '', ''], correctOption: 0, subject: 'Physics', topic: '' });
       alert("Question added to Bank successfully!");
   };
@@ -167,6 +170,7 @@ const TestCenter: React.FC<TestCenterProps> = ({
           questionIds: selectedQuestionIds
       };
       setTests(newTest);
+      api.createTest(newTest); // Call API
       setView('list');
       setNewTestMeta({ title: '', type: 'mock', duration: 180, totalMarks: 300 });
       setSelectedQuestionIds([]);

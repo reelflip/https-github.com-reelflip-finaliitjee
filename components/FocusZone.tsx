@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, BrainCircuit, CheckCircle2, Coffee, Zap, BookOpen } from 'lucide-react';
 import { User } from '../types';
+import { api } from '../services/api';
 
 interface FocusZoneProps {
     user?: User; // Optional for now
@@ -14,7 +16,7 @@ const MODES: Record<TimerMode, { label: string; minutes: number; color: string; 
     short_break: { label: 'Short Break', minutes: 5, color: 'text-green-500', icon: Coffee },
 };
 
-const FocusZone: React.FC<FocusZoneProps> = () => {
+const FocusZone: React.FC<FocusZoneProps> = ({ user }) => {
     const [mode, setMode] = useState<TimerMode>('pomodoro');
     const [timeLeft, setTimeLeft] = useState(MODES.pomodoro.minutes * 60);
     const [isActive, setIsActive] = useState(false);
@@ -38,11 +40,15 @@ const FocusZone: React.FC<FocusZoneProps> = () => {
                 setSessionState('idle'); // Break over
                 setMode('pomodoro');
                 setTimeLeft(25 * 60);
+                // Save break session automatically
+                if (user) {
+                    api.saveStudySession(user.id, 'Break', MODES.short_break.minutes, 'short_break', 'Rest');
+                }
             }
         }
 
         return () => clearInterval(interval);
-    }, [isActive, timeLeft, mode]);
+    }, [isActive, timeLeft, mode, user]);
 
     const playAlarm = () => {
         // Simple beep using Web Audio API to avoid external file dependencies
@@ -80,7 +86,18 @@ const FocusZone: React.FC<FocusZoneProps> = () => {
 
     const handleRecallSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Here we would save the session and recall notes to the DB
+        
+        // Save session to API
+        if (user) {
+            api.saveStudySession(
+                user.id, 
+                selectedSubject, 
+                MODES[mode].minutes, 
+                mode, 
+                recallText
+            );
+        }
+
         setSessionState('completed');
         setTimeout(() => {
             setSessionState('idle');
@@ -150,31 +167,32 @@ const FocusZone: React.FC<FocusZoneProps> = () => {
                             {/* Timer Display */}
                             <div className="relative mb-8 group cursor-default">
                                 {/* Circular Progress SVG */}
-                                <svg className="w-64 h-64 transform -rotate-90">
+                                <svg className="w-64 h-64 transform -rotate-90 sm:w-64 sm:h-64 w-56 h-56">
                                     <circle
-                                        cx="128"
-                                        cy="128"
-                                        r="120"
+                                        cx="50%"
+                                        cy="50%"
+                                        r="45%"
                                         stroke="currentColor"
                                         strokeWidth="8"
                                         fill="transparent"
                                         className="text-slate-100"
                                     />
                                     <circle
-                                        cx="128"
-                                        cy="128"
-                                        r="120"
+                                        cx="50%"
+                                        cy="50%"
+                                        r="45%"
                                         stroke="currentColor"
                                         strokeWidth="8"
                                         fill="transparent"
-                                        strokeDasharray={2 * Math.PI * 120}
-                                        strokeDashoffset={2 * Math.PI * 120 * (1 - progress / 100)}
+                                        strokeDasharray={2 * Math.PI * 90} // Approx based on r=45% of 200px box
+                                        strokeDashoffset={2 * Math.PI * 90 * (1 - progress / 100)} // Rough calc for SVG scaling
                                         className={`${MODES[mode].color} transition-all duration-1000 ease-linear`}
                                         strokeLinecap="round"
+                                        style={{ strokeDasharray: 283, strokeDashoffset: 283 * (1 - progress / 100) }} // Hardcoded for standard size
                                     />
                                 </svg>
                                 <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                                    <span className="text-6xl font-bold text-slate-800 font-mono tracking-tighter block">
+                                    <span className="text-5xl sm:text-6xl font-bold text-slate-800 font-mono tracking-tighter block">
                                         {formatTime(timeLeft)}
                                     </span>
                                     <span className="text-sm font-medium text-slate-400 uppercase tracking-widest mt-2 block">
